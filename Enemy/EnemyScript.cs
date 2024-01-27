@@ -39,7 +39,6 @@ public class EnemyScript : MonoBehaviour , IHuman
             m_Material.material = Dissolve;
             InvokeRepeating("SetDissolving",0.1f,0.01f);
             m_Collider.enabled = false;
-            print(Dissolve.GetFloat("_Timer"));
         }
     }
     public void SetDissolving()

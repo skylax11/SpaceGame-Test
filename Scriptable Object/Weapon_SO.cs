@@ -28,5 +28,10 @@ namespace Assets.Scripts.Scriptable_Object
         public Vector3 RightHandAimPos;
         public float LeftHandWeight;
         public float RightHandWeight;
+        public Vector3 WeaponSize;
+        public Vector3 WeaponIKRot;
+        public Vector3 LeftHintPos;
+        public Vector3 RightHintPos;
+        public GameObject BulletBox;
     }
 }

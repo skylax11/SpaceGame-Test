@@ -17,6 +17,7 @@ namespace Assets.Scripts.Weapons
         public int Ammo;
         public int Magazine;
         public int FullAmmo;
+        public GameObject BulletBox;
         public GameObject SpotLight;
         public GameObject LeftHand;
         public GameObject RightHand;
@@ -36,9 +37,9 @@ namespace Assets.Scripts.Weapons
                 Magazine = 0;
             }
         }
-        public void Fire()
-        {
-            Ammo--;
-        }
+        public abstract void Fire(Weapon weapon, GameObject prefab, Transform bulletHierarchy, Queue<GameObject> bullets);
+        public abstract GameObject ReloadAnimation(GameObject newMagazine,GameObject Magazine);
+        public abstract void SetReload(bool situation);
+        public abstract void ThrowWeaponAway();
     }
 }

@@ -1,14 +1,16 @@
+using Assets.Scripts.Character_Scripts.Inventory;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
 {
     public Vector2 direction;
-    public GunFireController m_GunFireController;
+    public WeaponController m_GunFireController;
     public UI_Manager m_UIManager;
-    private PlayerInput m_playerInput;
+    public PlayerInput m_playerInput;
     private Rigidbody m_RigidBody;
     private CapsuleCollider m_Collider;
     private void Start()
@@ -25,14 +27,14 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
                 return;
             m_UIManager.SprintCircleDecrease();
             OnSprint();
-            Controller.Instance.m_Speed = Mathf.Lerp(Controller.Instance.m_Speed, 1f, Time.deltaTime); 
+            Controller.Instance.m_Speed = Mathf.Lerp(Controller.Instance.m_Speed, 1f, Time.deltaTime);
         }
         else
         {
-            if(direction != Vector2.zero && !m_playerInput.actions["Crouch"].IsPressed())
-            SetWalking();
+            if (direction != Vector2.zero && !m_playerInput.actions["Crouch"].IsPressed())
+                SetWalking();
             m_UIManager.SprintCircleIncrease();
-            Controller.Instance.m_Speed = Mathf.Lerp(Controller.Instance.m_Speed,0.3f,Time.deltaTime);
+            Controller.Instance.m_Speed = Mathf.Lerp(Controller.Instance.m_Speed, 0.3f, Time.deltaTime);
         }
     }
     public void OnCrouch(InputValue val)
@@ -55,10 +57,13 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     }
     public void OnFlashLight()
     {
-        if (Controller.Instance.CurrentWeapon.SpotLight.GetComponent<Light>().enabled == false)
-            Controller.Instance.CurrentWeapon.SpotLight.GetComponent<Light>().enabled = true;
+        if (WeaponController.Instance.weapon == null)
+            return;
+
+        if (WeaponController.Instance.weapon.SpotLight.GetComponent<Light>().enabled == false)
+            WeaponController.Instance.weapon.SpotLight.GetComponent<Light>().enabled = true;
         else
-            Controller.Instance.CurrentWeapon.SpotLight.GetComponent<Light>().enabled = false;
+            WeaponController.Instance.weapon.SpotLight.GetComponent<Light>().enabled = false;
     }
     public void OnMove(InputValue val)
     {
@@ -67,13 +72,13 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
         if (direction == Vector2.zero)
         {
             AnimationController.Instance.SetAnimation("Walking", false);
-            if(m_playerInput.actions["Crouch"].IsPressed())
+            if (m_playerInput.actions["Crouch"].IsPressed())
                 Controller.Instance.Movement = Controller.MovementState.Crouching;
             else
                 Controller.Instance.Movement = Controller.MovementState.Standing;
             return;
         }
-        if (Controller.Instance.Movement == Controller.MovementState.Running || Controller.Instance.Movement == Controller.MovementState.Crouching)  
+        if (Controller.Instance.Movement == Controller.MovementState.Running || Controller.Instance.Movement == Controller.MovementState.Crouching)
             return;
         SetWalking();
     }
@@ -102,7 +107,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
         if (m_UIManager.SprintAmount == 0)
         {
             SetWalking();
-            return; 
+            return;
         }
         if (m_playerInput.actions["Crouch"].IsPressed())
             Controller.Instance.RunSpeed = Controller.Instance.CrouchRunSpeed;
@@ -112,18 +117,21 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     }
     public void OnReload()
     {
-        if (GunFireController.Instance.Reload())
+        if (WeaponController.Instance.Reload())
         {
             m_RigidBody.velocity = Vector3.zero;
             direction = Vector2.zero;
-            AnimationController.Instance.SetAnimation("Reload", true);
+            SlotSystem.Instance.CurrentSlot.SetReload(true);
         }
     }
-    public void OnSwap()
+    public void OnSwap(InputValue val)
     {
-        if (m_playerInput.actions["Swap"].IsPressed())
+        int key;
+        if (m_playerInput.actions["Swap"].IsPressed() && val.Get<Vector2>() != Vector2.zero)
         {
-            GunFireController.Instance.ChangeWeapon();
+            key = val.Get<Vector2>() == Vector2.up ? 1 : 2;
+            SlotSystem.Instance.ChangeWeapon(key);
         }
     }
+
 }

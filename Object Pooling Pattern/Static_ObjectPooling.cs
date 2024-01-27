@@ -10,8 +10,8 @@ public static class Static_ObjectPooling {
         if (bullets.Count <= weapon.FullAmmo)
         {
             GameObject bullet = GameObject.Instantiate(prefab, bulletDirection);
-            bullet.transform.parent = bulletHierarchy;
-            bullets.Enqueue(bullet);
+            bullet.transform.parent = bulletHierarchy; 
+            bullets.Enqueue(bullet); 
         }
         else
         {

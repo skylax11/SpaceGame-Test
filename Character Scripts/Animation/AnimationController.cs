@@ -1,3 +1,4 @@
+using Assets.Scripts.Character_Scripts.Inventory;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,18 +17,11 @@ public class AnimationController : MonobehaviourSingleton<AnimationController>
     }
     public void SetReloadForEditor()
     {
-        animator.SetBool("Reload", false);
+        SlotSystem.Instance.CurrentSlot.SetReload(false);
     }
     public void ReloadAnimationTakeOffMagazine(GameObject newMagazine)
     {
-        Magazine.SetActive(false);
-        GameObject income = Instantiate(newMagazine, null);
-        income.transform.localScale = new Vector3(0.1f,0.1f,0.1f);
-        income.transform.parent = null;
-        income.transform.position = Magazine.transform.position;
-        income.transform.rotation = Magazine.transform.rotation;
-        income.transform.GetComponent<Rigidbody>().useGravity = true;
-        income.transform.GetComponent<Rigidbody>().AddForce(transform.forward.normalized * 40f);
+        var income = SlotSystem.Instance.CurrentSlot.ReloadAnimation(newMagazine,Magazine);
         StartCoroutine("SetCollider",income);
     }
     IEnumerator SetCollider(GameObject income)

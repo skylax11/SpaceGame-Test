@@ -19,9 +19,6 @@ public class Controller : MonobehaviourSingleton<Controller>
     private Vector3 _direction;
     public MovementState Movement;
 
-    [Header("Weapon")]
-    public Weapon CurrentWeapon;
-
     [Header("Layer For Mouse")]
     public LayerMask layer;
     [Header("Animation")]
@@ -76,7 +73,9 @@ public class Controller : MonobehaviourSingleton<Controller>
                 var relativePos = transform.position - hitInfo.point;
                 var rotation = Quaternion.LookRotation(-relativePos).eulerAngles;
                 transform.rotation = Quaternion.Euler(0, rotation.y, 0);
-            }                
+            }
+            else
+                return;
         }
 
     }
