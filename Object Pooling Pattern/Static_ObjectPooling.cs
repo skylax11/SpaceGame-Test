@@ -10,6 +10,7 @@ public static class Static_ObjectPooling {
         if (bullets.Count <= weapon.FullAmmo)
         {
             GameObject bullet = GameObject.Instantiate(prefab, bulletDirection);
+            bullet.GetComponent<BulletScript>().damage = (int)weapon.Damage;
             bullet.transform.parent = bulletHierarchy; 
             bullets.Enqueue(bullet); 
         }
@@ -20,7 +21,7 @@ public static class Static_ObjectPooling {
             {
                 bullet.transform.rotation = bulletDirection.rotation;
                 bullet.transform.position = bulletDirection.position;
-                bullet.GetComponent<BulletScript>().resetVelo();
+                bullet.GetComponent<BulletScript>().ResetVelo();
                 bullet.SetActive(true);
             }
             else
@@ -37,7 +38,7 @@ public static class Static_ObjectPooling {
                     {
                         bullet.transform.rotation = bulletDirection.rotation;
                         bullet.transform.position = bulletDirection.position;
-                        bullet.transform.GetComponent<BulletScript>().resetVelo();
+                        bullet.transform.GetComponent<BulletScript>().ResetVelo();
                         bullet.gameObject.SetActive(true);
                         break;
                     }

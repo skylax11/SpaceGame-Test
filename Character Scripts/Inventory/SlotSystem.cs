@@ -25,6 +25,7 @@ namespace Assets.Scripts.Character_Scripts.Inventory
         }
         public void ChangeWeapon(int key) 
         {
+            
             if (key == 1)
             {
                 Slot1.gameObject.SetActive(true);
@@ -33,7 +34,7 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot2.transform.name = "Disabled" + Slot2.WeaponSO.Name;
                 CurrentSlot = Slot1;
             }
-            else                         // WEAPON NAMES ARE REDECLARED CAUSE PREVENT ANY BUGS WHICH CAN OCCUR FROM ANIMATION
+            else if(key == 2)                         // WEAPON NAMES ARE RE-DECLARED CAUSE PREVENT ANY BUGS WHICH CAN OCCUR FROM ANIMATION
             {                            
                 Slot2.gameObject.SetActive(true);
                 Slot1.gameObject.SetActive(false);
@@ -44,15 +45,21 @@ namespace Assets.Scripts.Character_Scripts.Inventory
             if (CurrentSlot != _emptySlot)
                 SetRigSettings.Instance.SetRigDatas(CurrentSlot);
             else
-                SetRigSettings.Instance.ResetRigDatas();
+                SetRigSettings.Instance.ResetRigDatas(CurrentSlot);
             AnimationController.Instance.Magazine = CurrentSlot.BulletBox;
             UpdateAmmoInfo();
         }
         public void PickUp(WeaponStands stand)
         {
             if (Slot1 != _emptySlot && Slot2 != _emptySlot)
+            {
                 CurrentSlot.ThrowWeaponAway();   // i love polymorphism...
-
+                if (CurrentSlot == Slot1)
+                    Slot1 = CurrentSlot = _emptySlot;
+                if (CurrentSlot == Slot2)
+                    Slot2 = CurrentSlot = _emptySlot;
+            }
+                
             Weapon pickUpWeapon = stand.weapon;
             Transform boxPos = stand.weapon.BulletBox.transform;
 
@@ -62,12 +69,27 @@ namespace Assets.Scripts.Character_Scripts.Inventory
             stand.text.enabled = false;
             Destroy(stand); // Removing script from object. It's no longer a Weapon stander.
 
-            if (Slot1 == _emptySlot)
-                Slot1 = pickUpWeapon;
-            else if (Slot2 == _emptySlot)
+            
+            if ((Slot1 != _emptySlot && Slot1 == CurrentSlot) && Slot2 == _emptySlot)
+            {
                 Slot2 = pickUpWeapon;
-
-            CurrentSlot = pickUpWeapon;
+                Slot2.gameObject.SetActive(false);
+            }
+            else if ((Slot2 != _emptySlot && Slot2 == CurrentSlot) && Slot1 == _emptySlot)
+            {
+                Slot1 = pickUpWeapon;
+                Slot1.gameObject.SetActive(false);
+            }
+            else if ((Slot1 == _emptySlot))
+            {
+                Slot1 = pickUpWeapon;
+                CurrentSlot = Slot1;
+            }
+            else if (Slot2 == _emptySlot)
+            {
+                Slot2 = pickUpWeapon;
+                CurrentSlot = Slot2;
+            }
 
             SetRigSettings.Instance.SetRigDatas(CurrentSlot);
             UpdateAmmoInfo();

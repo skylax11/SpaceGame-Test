@@ -14,6 +14,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
     public Weapon weapon;
     private PlayerInput m_playerInput;
     public WeaponSituation WeaponEnum;
+    public bool isAvailable = true;
     [Header("Bullet")]
     private Queue<GameObject> _bullets = new Queue<GameObject>();
     [SerializeField] GameObject bulletPrefab;
@@ -46,7 +47,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
     {
         if (weapon == null)
             return;
-        if (m_playerInput.actions["shot"].IsPressed() && weapon.Ammo > 0)
+        if ((m_playerInput.actions["shot"].IsPressed() && weapon.Ammo > 0)  && weapon.isReadyToUse)
         {
             WeaponEnum = WeaponSituation.Firing;
             SetRigSettings.Instance.LetSetRigs = true;
@@ -57,6 +58,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
         }
         else
         {
+            if(SetRigSettings.Instance._aimingRig.weight == 0f)
             WeaponEnum = WeaponSituation.Holding;
             SetRigSettings.Instance.LetSetRigs = false;
             AnimationController.Instance.SetAnimation("IsShooting", false);
@@ -72,10 +74,11 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
     }
     public bool Reload()
     {
-        if (weapon != null)
+        if (weapon != null && WeaponEnum == WeaponSituation.Holding)
         {
             if (weapon.Magazine > 0)
             {
+                weapon.isReadyToUse = false;
                 weapon.Reload();
                 m_UIManager.UpdateAmmo(weapon.Ammo);
                 m_UIManager.UpdateMagazine(weapon.Magazine);
@@ -83,4 +86,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
             }
         }
         return false;
-    }}
+    }
+    public void SetAvailableSituation() => weapon.isReadyToUse = true;
+
+}

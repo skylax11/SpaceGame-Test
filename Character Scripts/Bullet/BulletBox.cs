@@ -7,10 +7,7 @@ public class BulletBox : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag == "Ground")
-        {
-            print("sa");
             StartCoroutine("SetProps");
-        }
     }
     IEnumerator SetProps()
     {

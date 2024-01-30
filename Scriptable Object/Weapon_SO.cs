@@ -32,6 +32,8 @@ namespace Assets.Scripts.Scriptable_Object
         public Vector3 WeaponIKRot;
         public Vector3 LeftHintPos;
         public Vector3 RightHintPos;
+        public Vector3 LeftHintPosAim;
+        public Vector3 RightHintPosAim;
         public GameObject BulletBox;
     }
 }

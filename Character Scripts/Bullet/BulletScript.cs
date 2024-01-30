@@ -8,15 +8,14 @@ public class BulletScript : MonoBehaviour
 {
     [SerializeField] Rigidbody m_RigidBody;
     [SerializeField] GameObject effect;
+    public int damage;
     private float speed = 60f;
-    void Start()
-    {
-        ReCall();
-    }
+    void Start() => ReCall();
+
     public IEnumerator SetVisible()
     {
         yield return new WaitForSeconds(2f);
-        resetVelo();
+        ResetVelo();
         gameObject.SetActive(false);
     }
     public void ReCall()
@@ -27,22 +26,19 @@ public class BulletScript : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if(!collision.transform.TryGetComponent(out Controller player))
-        gameObject.SetActive(false);
+            gameObject.SetActive(false);
         if (collision.transform.TryGetComponent(out IWall wallType))
         {
             GameObject theEffect = Instantiate(wallType.EffectGameObjectPrefab);
             theEffect.transform.position = transform.position;
+
             if (wallType.Effect != null)
-            {
                 wallType.Effect.Play();
-            }
         }
         if (collision.transform.TryGetComponent(out IHuman human))
-        {
-            human.TakeDamage(20);
-        }
+            human.TakeDamage(damage, collision.transform.position - transform.position);
     }
-    public void resetVelo()
+    public void ResetVelo()
     {
         m_RigidBody.velocity = Vector3.zero;
         m_RigidBody.velocity = GetSpeed();

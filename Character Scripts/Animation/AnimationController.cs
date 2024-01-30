@@ -7,18 +7,12 @@ public class AnimationController : MonobehaviourSingleton<AnimationController>
 {
     public Animator animator;
     public GameObject Magazine;
-    private void Start()
-    {
-        animator = GetComponent<Animator>();
-    }
-    public void SetAnimation(string name, bool situation)
-    {
-        animator.SetBool(name, situation);
-    }
-    public void SetReloadForEditor()
-    {
-        SlotSystem.Instance.CurrentSlot.SetReload(false);
-    }
+
+    private void Start() => animator = GetComponent<Animator>();
+    public void SetAnimation(string name, bool situation) => animator.SetBool(name, situation);
+    public void SetReloadForEditor() => SlotSystem.Instance.CurrentSlot.SetReload(false);
+    public void ReloadAnimationSetEnableMagazine() => Magazine.SetActive(true);
+
     public void ReloadAnimationTakeOffMagazine(GameObject newMagazine)
     {
         var income = SlotSystem.Instance.CurrentSlot.ReloadAnimation(newMagazine,Magazine);
@@ -28,9 +22,5 @@ public class AnimationController : MonobehaviourSingleton<AnimationController>
     {
         yield return new WaitForSeconds(0.5f);
         income.transform.GetComponent<Collider>().enabled = true;
-    }
-    public void ReloadAnimationSetEnableMagazine()
-    {
-        Magazine.SetActive(true);
     }
 }

@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour , IHuman
+public class BodyPartsOfEnemy : MonoBehaviour , IHuman
 {
+    private EnemyScript HeaderScript;
     [SerializeField] int _health;
     public int Health
     {
@@ -17,8 +18,6 @@ public class Character : MonoBehaviour , IHuman
             _health = value;
         }
     }
-    public void TakeDamage(int damage, Vector3 hitDirection)
-    {
-        _health -= damage;
-    }
+    void Start() => HeaderScript = GetComponentInParent<EnemyScript>();
+    public void TakeDamage(int damage, Vector3 hitDirection) => HeaderScript.TakeDamage(damage,hitDirection);
 }

@@ -127,7 +127,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     public void OnSwap(InputValue val)
     {
         int key;
-        if (m_playerInput.actions["Swap"].IsPressed() && val.Get<Vector2>() != Vector2.zero)
+        if ((m_playerInput.actions["Swap"].IsPressed() && val.Get<Vector2>() != Vector2.zero) && WeaponController.Instance.WeaponEnum == WeaponController.WeaponSituation.Holding)
         {
             key = val.Get<Vector2>() == Vector2.up ? 1 : 2;
             SlotSystem.Instance.ChangeWeapon(key);

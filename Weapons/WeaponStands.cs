@@ -8,8 +8,5 @@ public class WeaponStands : MonoBehaviour
 {
     [SerializeField] public Weapon weapon;
     [SerializeField] public TextMeshPro text;
-    private void Start()
-    {
-        // Empty function for script's check-box property...
-    }
+
 }

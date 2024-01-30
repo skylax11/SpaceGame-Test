@@ -11,6 +11,7 @@ public class SetRigSettings : MonobehaviourSingleton<SetRigSettings>
 {
     public bool LetSetRigs;
     public Rig _aimingRig;
+    public Rig _holdingRig;
     public RigBuilder rigBuild;
     [SerializeField] GameObject AimPose;
     public MultiPositionConstraint MultiPositionConstraint_Stand;
@@ -29,28 +30,24 @@ public class SetRigSettings : MonobehaviourSingleton<SetRigSettings>
     private GameObject _currentWeapon;
     [SerializeField] Weapon_SO _currentSO;
     [SerializeField] WeaponController CurrentWeapon;
-    void Start()
-    {
-        SetNewWeaponSettings();
-    }
+    void Start() => SetNewWeaponSettings();
+    public void BuildRig() => rigBuild.Build();
+
     public void SetNewWeaponSettings()
     {
-        if (GetComponent<SlotSystem>().CurrentSlot.gameObject == null)// ileriki kýsýmlarda silah deðiþtirmede boþ ele geçerken eðer nullsa bu script kaaptýlacak
+        if (GetComponent<SlotSystem>().CurrentSlot.gameObject == null)
         {
             this.enabled = false;
             return;
         }
         else
-            this.enabled = true;   // unreachable code
+            this.enabled = true;
 
         _currentWeapon = GetComponent<SlotSystem>().CurrentSlot.gameObject;
         _currentSO = _currentWeapon.GetComponent<Weapon>().WeaponSO;
-
-        
     }
-    public void BuildRig() => rigBuild.Build();
     void Update()
-    {
+    {       
         if (LetSetRigs)
         {
             AimPose.transform.localRotation = Quaternion.Slerp(AimPose.transform.localRotation, Quaternion.Euler(_currentSO.WeaponAimRotate.x, _currentSO.WeaponAimRotate.y, _currentSO.WeaponAimRotate.z), Time.deltaTime * 15f);
@@ -106,9 +103,10 @@ public class SetRigSettings : MonobehaviourSingleton<SetRigSettings>
 
         BuildRig();
     }
-    public void ResetRigDatas()
+    public void ResetRigDatas(Weapon weapon)
     {
-       
+        CurrentWeapon.weapon = weapon;
+
         TwoBoneConstraintIK_Left.data.target  = null;
         TwoBoneConstraintIK_Right.data.target = null;
 

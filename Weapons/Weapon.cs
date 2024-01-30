@@ -23,6 +23,7 @@ namespace Assets.Scripts.Weapons
         public GameObject RightHand;
         public Transform BulletPos;
         public bool isDualWeapon;
+        public bool isReadyToUse;
         public void Reload()
         {
             int neededAmmo = FullAmmo - Ammo;

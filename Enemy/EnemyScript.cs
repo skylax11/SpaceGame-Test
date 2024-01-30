@@ -5,19 +5,10 @@ using UnityEngine;
 
 public class EnemyScript : MonoBehaviour , IHuman
 {
-    [Header("Dissolving")]
-    [SerializeField] Material Dissolve;
-    [SerializeField] float _dissolveSpeed;
+    [SerializeField] EnemyScript_DissolveEffect m_dissolveEffect;
+    [SerializeField] EnemyScript_Rigs m_Rigs;
     [SerializeField] int _health;
-    private float _dissolveTime = -1f;
 
-    private MeshRenderer m_Material;
-    private Collider m_Collider;
-    private void Start()
-    {
-        m_Material = GetComponent<MeshRenderer>();
-        m_Collider = GetComponent<Collider>();
-    }
     public int Health
     {
         get
@@ -29,28 +20,32 @@ public class EnemyScript : MonoBehaviour , IHuman
             _health = value;
         }
     }
-
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage,Vector3 hitDirection)
     {
         _health -= damage;
         if (_health <= 0)
         {
-            Dissolve.SetFloat("_Timer", -1f);
-            m_Material.material = Dissolve;
-            InvokeRepeating("SetDissolving",0.1f,0.01f);
-            m_Collider.enabled = false;
+            Death(hitDirection);
+            m_dissolveEffect.DoDissolving();
         }
     }
-    public void SetDissolving()
+    public void Death(Vector3 hitDirection)
     {
-        
-        float dissolve = Dissolve.GetFloat("_Timer");
-        _dissolveTime += _dissolveSpeed;
-        m_Material.material.SetFloat("_Timer", _dissolveTime);
-        if (dissolve >= 1)
+        GetComponent<Collider>().enabled = false;
+        foreach (var Rigidbody_Parts in GetComponentsInChildren<Rigidbody>())
         {
-            CancelInvoke("SetDissolving");
-            gameObject.SetActive(false);
+            Rigidbody_Parts.isKinematic = false;
+            Rigidbody_Parts.useGravity  = true;
         }
+        foreach (var Collider in GetComponentsInChildren<Collider>())
+            Collider.enabled = true;
+        var direction = hitDirection - transform.position;
+        StartCoroutine("DisableAnimator");
+        GetComponent<Rigidbody>().AddForce(direction.normalized * 30f * Time.deltaTime, ForceMode.Impulse);
+    }
+    IEnumerator DisableAnimator()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GetComponentInParent<Animator>().enabled = false;
     }
 }
