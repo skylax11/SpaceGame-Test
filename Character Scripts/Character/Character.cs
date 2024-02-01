@@ -19,6 +19,13 @@ public class Character : MonoBehaviour , IHuman
     }
     public void TakeDamage(int damage, Vector3 hitDirection)
     {
+        UpdateUI(damage);
+        
+    }
+    public void UpdateUI(int damage)
+    {
+        int oldHealth = _health;
         _health -= damage;
+        UI_Manager.Instance.Health.text = ((int)Mathf.Lerp(oldHealth, _health,Time.deltaTime*15f)).ToString();
     }
 }

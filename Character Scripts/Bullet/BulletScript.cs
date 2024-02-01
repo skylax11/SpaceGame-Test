@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -10,7 +11,12 @@ public class BulletScript : MonoBehaviour
     [SerializeField] GameObject effect;
     public int damage;
     private float speed = 60f;
-    void Start() => ReCall();
+    void Start()
+    {
+        Physics.IgnoreCollision(GetComponent<Collider>(), GetComponentInParent<StoreCollider>().ignored);
+        ReCall();
+    }
+
 
     public IEnumerator SetVisible()
     {

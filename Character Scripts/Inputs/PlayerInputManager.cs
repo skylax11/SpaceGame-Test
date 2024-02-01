@@ -15,7 +15,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     private CapsuleCollider m_Collider;
     private void Start()
     {
-        m_Collider = GetComponent<CapsuleCollider>();
+        m_Collider = GetComponentInChildren<CapsuleCollider>();
         m_RigidBody = GetComponent<Rigidbody>();
         m_playerInput = GetComponent<PlayerInput>();
     }

@@ -5,13 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_Manager : MonoBehaviour 
+public class UI_Manager : MonobehaviourSingleton<UI_Manager>
 {
     [SerializeField] Image HealthBar;
     [SerializeField] Image SprintBar;
     [SerializeField] TextMeshProUGUI Ammo;
     [SerializeField] TextMeshProUGUI Magazine;
-    [SerializeField] TextMeshProUGUI Health;
+    [SerializeField] public TextMeshProUGUI Health;
     [SerializeField] TextMeshProUGUI Sprint;
     [SerializeField] TextMeshProUGUI InfoText;
     [SerializeField] public GameObject InfoPanel;

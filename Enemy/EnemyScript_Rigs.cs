@@ -8,7 +8,7 @@ public class EnemyScript_Rigs : MonoBehaviour
 {
     [SerializeField] Weapon_SO Enemy_SO;
     public RigBuilder rigBuild;
-    [SerializeField] bool checkBox;
+    [SerializeField] public bool enableRig;
     [SerializeField] Transform LeftHand;
     [SerializeField] Transform RightHand;
     [SerializeField] Transform LeftHint;
@@ -20,7 +20,7 @@ public class EnemyScript_Rigs : MonoBehaviour
 
     void Update()
     {
-        if (checkBox)
+        if (enableRig)
         {
             _aimingRig.weight += Time.deltaTime * 20f;
             LeftHand.localPosition = Vector3.Slerp(LeftHand.localPosition, Enemy_SO.LeftHandAimPos, Time.deltaTime * 15f);
@@ -29,7 +29,6 @@ public class EnemyScript_Rigs : MonoBehaviour
             RightHand.localRotation = Quaternion.Slerp(RightHand.localRotation, Quaternion.Euler(Enemy_SO.RightHandAimRot.x, Enemy_SO.RightHandAimRot.y, Enemy_SO.RightHandAimRot.z), Time.deltaTime * 15f);
             LeftHint.localPosition = Vector3.Slerp(LeftHint.localPosition, Enemy_SO.LeftHintPosAim, Time.deltaTime * 15f);
             RightHint.localPosition = Vector3.Slerp(RightHint.localPosition, Enemy_SO.RightHintPosAim, Time.deltaTime * 15f);
-            //      RotateChest.localRotation = Quaternion.Slerp(RotateChest.localRotation, Quaternion.Euler(4f, RotateChest.localRotation.y, RotateChest.localRotation.z), Time.deltaTime * 5f);
         }
         else
         {
@@ -40,7 +39,6 @@ public class EnemyScript_Rigs : MonoBehaviour
             RightHand.localRotation = Quaternion.Slerp(RightHand.localRotation, Quaternion.Euler(Enemy_SO.RightHandPoseRot.x, Enemy_SO.RightHandPoseRot.y, Enemy_SO.RightHandPoseRot.z), Time.deltaTime * 15f);
             LeftHint.localPosition = Vector3.Slerp(LeftHint.localPosition, Enemy_SO.LeftHintPos, Time.deltaTime * 15f);
             RightHint.localPosition = Vector3.Slerp(RightHint.localPosition, Enemy_SO.RightHintPos, Time.deltaTime * 15f);
-            //    RotateChest.localRotation = Quaternion.Slerp(RotateChest.localRotation, Quaternion.Euler(-9f, RotateChest.localRotation.y, RotateChest.localRotation.z), Time.deltaTime * 5f);
         }
     }
 
