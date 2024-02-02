@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyScript_DissolveEffect : MonoBehaviour
+public class DissolveEffect : MonoBehaviour
 {
     [Header("Dissolving")]
     [SerializeField] Material Dissolve;
@@ -11,15 +11,14 @@ public class EnemyScript_DissolveEffect : MonoBehaviour
 
     [SerializeField] SkinnedMeshRenderer[] m_SkinnedMeshMaterials;
     [SerializeField] MeshRenderer[] m_Materials;
-    private Collider m_Collider;
-    private void Start()
+    public void SetMaterials()
     {
         m_SkinnedMeshMaterials = GetComponentsInChildren<SkinnedMeshRenderer>();
         m_Materials = GetComponentsInChildren<MeshRenderer>();
-        m_Collider = GetComponent<Collider>();
     }
     public void DoDissolving()
     {
+        SetMaterials();
         Dissolve.SetFloat("_Timer", -1f);
         foreach (var m in m_SkinnedMeshMaterials)
         {
@@ -47,11 +46,17 @@ public class EnemyScript_DissolveEffect : MonoBehaviour
         _dissolveTime += _dissolveSpeed;
         foreach (var m in m_SkinnedMeshMaterials)
         {
-            m.material.SetFloat("_Timer", _dissolveTime);
+            Material[] materials = m.materials;
+            for (int i = 0; i < materials.Length; i++)
+                materials[i].SetFloat("_Timer", _dissolveTime);
+            m.materials = materials;
         }
         foreach (var m in m_Materials)
         {
-            m.material.SetFloat("_Timer", _dissolveTime);
+            Material[] materials = m.materials;
+            for (int i = 0; i < materials.Length; i++)
+                materials[i].SetFloat("_Timer", _dissolveTime);
+            m.materials = materials;
         }
         if (_dissolveTime >= 1)
         {

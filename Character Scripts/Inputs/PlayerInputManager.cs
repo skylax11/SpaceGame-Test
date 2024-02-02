@@ -1,4 +1,5 @@
 using Assets.Scripts.Character_Scripts.Inventory;
+using Assets.Scripts.Enum;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -44,7 +45,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
             AnimationController.Instance.SetAnimation("Crouch", true);
             m_Collider.center = new Vector3(0, 0.7579631f, 0);
             m_Collider.height = 1.515926f;
-            Controller.Instance.Movement = Controller.MovementState.Crouching;
+            Controller.Instance.Movement = MovementState.Crouching;
         }
         else
         {
@@ -52,7 +53,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
             m_Collider.center = new Vector3(0, 0.9406704f, 0);
             m_Collider.height = 1.881341f;
             if (direction == Vector2.zero)
-                Controller.Instance.Movement = Controller.MovementState.Standing;
+                Controller.Instance.Movement = MovementState.Standing;
         }
     }
     public void OnFlashLight()
@@ -73,12 +74,12 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
         {
             AnimationController.Instance.SetAnimation("Walking", false);
             if (m_playerInput.actions["Crouch"].IsPressed())
-                Controller.Instance.Movement = Controller.MovementState.Crouching;
+                Controller.Instance.Movement = MovementState.Crouching;
             else
-                Controller.Instance.Movement = Controller.MovementState.Standing;
+                Controller.Instance.Movement = MovementState.Standing;
             return;
         }
-        if (Controller.Instance.Movement == Controller.MovementState.Running || Controller.Instance.Movement == Controller.MovementState.Crouching)
+        if (Controller.Instance.Movement == MovementState.Running || Controller.Instance.Movement == MovementState.Crouching)
             return;
         SetWalking();
     }
@@ -86,20 +87,20 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     {
         AnimationController.Instance.SetAnimation("Running", false);
         AnimationController.Instance.SetAnimation("Walking", true);
-        Controller.Instance.Movement = Controller.MovementState.Moving;
+        Controller.Instance.Movement = MovementState.Moving;
     }
     public void SetRunning()
     {
         AnimationController.Instance.SetAnimation("Walking", false);
         AnimationController.Instance.SetAnimation("Running", true);
-        Controller.Instance.Movement = Controller.MovementState.Running;
+        Controller.Instance.Movement = MovementState.Running;
     }
     public void OnSprint()
     {
         if (direction == Vector2.zero)
         {
             AnimationController.Instance.SetAnimation("Running", false);
-            Controller.Instance.Movement = Controller.MovementState.Standing;
+            Controller.Instance.Movement = MovementState.Standing;
             return;
         }
         if (direction.y <= 0)

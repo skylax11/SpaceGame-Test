@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class UI_Manager : MonobehaviourSingleton<UI_Manager>
 {
-    [SerializeField] Image HealthBar;
+    [SerializeField] public Image HealthBar;
     [SerializeField] Image SprintBar;
     [SerializeField] TextMeshProUGUI Ammo;
     [SerializeField] TextMeshProUGUI Magazine;

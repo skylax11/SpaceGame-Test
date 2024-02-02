@@ -47,7 +47,7 @@ public static class Static_ObjectPooling {
             }
         }
     }
-    public static void do_ObjectPoolingEnemy(GameObject prefab, Transform bulletHierarchy, Transform bulletDirection, Queue<GameObject> bullets)
+    public static void do_ObjectPooling(GameObject prefab, Transform bulletHierarchy, Transform bulletDirection, Queue<GameObject> bullets)
     {
         if (bullets.Count <= 30)
         {

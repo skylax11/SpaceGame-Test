@@ -27,7 +27,7 @@ namespace Assets.Scripts.Enemy
                 if (Vector3.Angle(transform.forward,direction) < angle / 2)
                 {
                     float distanceToTarget = Vector3.Distance(transform.position, target.position);
-                    if (!Physics.Raycast(transform.position, direction, Mathf.Infinity, ObstructionMask))
+                    if (!Physics.Raycast(transform.position, target.position - transform.position, distanceToTarget, ObstructionMask))
                         m_EnemyScript.isPlayerDetected = true;
                     else
                         m_EnemyScript.isPlayerDetected = false;

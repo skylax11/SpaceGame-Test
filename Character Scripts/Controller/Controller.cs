@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using Assets.Scripts.Enum;
 using Assets.Scripts.Weapons;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,13 +29,7 @@ public class Controller : MonobehaviourSingleton<Controller>
     [SerializeField] Rigidbody m_Rigidbody;
     [Header("UI")]
     [SerializeField] UI_Manager m_UIManager;
-    public enum MovementState
-    {
-        Moving,
-        Running,
-        Crouching,
-        Standing
-    }
+  
     private void Start() => transform.rotation = Quaternion.Euler(0, 180, 0);
 
     private void Update()

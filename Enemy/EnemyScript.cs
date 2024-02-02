@@ -1,5 +1,6 @@
 using Assets.Scripts;
 using Assets.Scripts.Enemy;
+using Assets.Scripts.Enum;
 using Assets.Scripts.Weapons;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour , IHuman
 {
-    [SerializeField] EnemyScript_DissolveEffect m_dissolveEffect;
+    [SerializeField] DissolveEffect m_dissolveEffect;
     [SerializeField] EnemyScript_PlayerDetection m_Detection;
     [SerializeField] EnemyScript_Rigs m_Rigs;
     [SerializeField] Controller Player;
@@ -19,6 +20,7 @@ public class EnemyScript : MonoBehaviour , IHuman
     public bool isPlayerDetected;
     public float MinDistance;
     public float MaxDistance;
+    public GameObject Weapon_GO;
     [Header("Object Pooling")]
     [SerializeField] Transform TransformHierarchy;
     [SerializeField] GameObject BulletPrefab;
@@ -28,12 +30,18 @@ public class EnemyScript : MonoBehaviour , IHuman
     private float _fireCounter;
     [Header("NavMesh Agent")]
     public NavMeshAgent navMeshAgent;
+    public Vector3 StartPoint;
     [Header("Strafe Properties")]
     public Transform StrafeLeft;
     public Transform StrafeRight;
     public bool isGoingLeft;
     public bool isGoingRight;
     public bool CanStrafe;
+    [Header("Movement Situation")]
+    public MovementState Movement;
+    public float RunSpeed  = 7f;
+    public float WalkSpeed = 5f;
+    public float TotalSpeed;
     public int Health
     {
         get
@@ -47,15 +55,19 @@ public class EnemyScript : MonoBehaviour , IHuman
     }
     private void Update()
     {
+        if (Movement == MovementState.Moving)
+            TotalSpeed = Mathf.Lerp(TotalSpeed, WalkSpeed, Time.deltaTime * 5f);
+        else if (Movement == MovementState.Running)
+            TotalSpeed = Mathf.Lerp(TotalSpeed, RunSpeed, Time.deltaTime * 5f);
+
         if (isPlayerDetected)
         {
             if (Vector3.Distance(transform.position, Player.transform.position) > MaxDistance)
             {
                 ResetAllBehaviour();
+                ComeBack();
                 return;
             }
-
-            navMeshAgent.isStopped = false;
 
             if (Vector3.Distance(transform.position, Player.transform.position) > MinDistance)
                 Chase();
@@ -73,8 +85,8 @@ public class EnemyScript : MonoBehaviour , IHuman
         }
         else
         {
-            m_Rigs.enableRig = false;
-            m_Animator.SetBool("RealizedEnemy", false);
+            ResetAllBehaviour();
+            ComeBack();
         }
     }
     public void ResetAllBehaviour()
@@ -83,10 +95,23 @@ public class EnemyScript : MonoBehaviour , IHuman
         ResetStrafe();
         StopChasing();
         m_Animator.SetBool("RealizedEnemy", false);
-        navMeshAgent.isStopped = true;
+    }
+    public void ComeBack()
+    {
+        Movement = MovementState.Moving;
+        navMeshAgent.isStopped = false;
+        navMeshAgent.stoppingDistance = 0;
+        navMeshAgent.speed = TotalSpeed;
+        navMeshAgent.SetDestination(StartPoint);
+        
+        if (Vector3.Distance(transform.position, StartPoint) <= 1)
+            m_Animator.SetBool("ComeBack", false);
+        else
+            m_Animator.SetBool("ComeBack", true);
     }
     public void DoStrafe()
     {
+        navMeshAgent.isStopped = true;
         int temp = 1;
         if (!isGoingLeft)
         {
@@ -100,19 +125,21 @@ public class EnemyScript : MonoBehaviour , IHuman
             m_Animator.SetBool("RightStrafe", false);
             temp = -1;
         }
-        transform.Translate(new Vector3(Time.deltaTime*temp, 0, 0) * 2f);
+        transform.Translate(new Vector3(Time.deltaTime*temp, 0, 0) * TotalSpeed);
 
     }
     public void Strafe()
     {
-        if (!Physics.Raycast(StrafeLeft.transform.position, -StrafeLeft.transform.right,1f) && isGoingLeft)
+        Debug.DrawRay(StrafeLeft.transform.position, -StrafeLeft.transform.right, Color.blue);
+        Debug.DrawRay(StrafeRight.transform.position, StrafeRight.transform.right, Color.red);
+        if (!Physics.Raycast(StrafeLeft.transform.position, -StrafeLeft.transform.right, 0.1f) && isGoingLeft)
             isGoingLeft = true;
         else
         {
             isGoingLeft = false;
             isGoingRight = true;
         }
-        if (!Physics.Raycast(StrafeRight.transform.position, StrafeRight.transform.right, 1f) && isGoingRight)
+        if (!Physics.Raycast(StrafeRight.transform.position, StrafeRight.transform.right, 0.1f) && isGoingRight)
             isGoingLeft = false;
         else
         {
@@ -129,12 +156,21 @@ public class EnemyScript : MonoBehaviour , IHuman
     }
     public void Chase()
     {
+        Movement = MovementState.Running;
+        navMeshAgent.isStopped = false;
         ResetStrafe();
         m_Animator.SetBool("StartChasing", true);
         navMeshAgent.isStopped = false;
+        navMeshAgent.stoppingDistance = MinDistance;
+        navMeshAgent.speed = TotalSpeed;
         navMeshAgent.SetDestination(Player.transform.position);
     }
-    public void StopChasing() => m_Animator.SetBool("StartChasing", false);
+    public void StopChasing()
+    {
+        Movement = MovementState.Moving;
+        navMeshAgent.stoppingDistance = MinDistance;
+        m_Animator.SetBool("StartChasing", false);
+    }
 
     public void LookPlayer()
     {
@@ -147,7 +183,7 @@ public class EnemyScript : MonoBehaviour , IHuman
         if (Time.time > _fireCounter)
         {
             _fireCounter = FireFreq + Time.time;
-            Static_ObjectPooling.do_ObjectPoolingEnemy(BulletPrefab, TransformHierarchy, BulletDirection, _bullets);
+            Static_ObjectPooling.do_ObjectPooling(BulletPrefab, TransformHierarchy, BulletDirection, _bullets);
         }
     }
     public void TakeDamage(int damage,Vector3 hitDirection)
@@ -165,7 +201,13 @@ public class EnemyScript : MonoBehaviour , IHuman
         navMeshAgent.enabled = false;
         m_Detection.enabled = false;
         isPlayerDetected = false;
-        GetComponent<Collider>().enabled = false;
+
+        var RigidbodyWep = Weapon_GO.GetComponent<Rigidbody>();
+        RigidbodyWep.isKinematic = false;
+        RigidbodyWep.useGravity = true;
+        RigidbodyWep.velocity = Vector3.zero;
+        RigidbodyWep.AddForce(new Vector3(0f, 0f, -hitDirection.normalized.z), ForceMode.Force);
+
         m_Animator.updateMode = AnimatorUpdateMode.Normal;
         DisableConstraints();
         foreach (var Rigidbody_Parts in GetComponentsInChildren<Rigidbody>())
@@ -177,8 +219,11 @@ public class EnemyScript : MonoBehaviour , IHuman
         }
         foreach (var Collider in GetComponentsInChildren<Collider>())
             Collider.enabled = true;
+
         StartCoroutine("DisableAnimator");
         spine.AddForce(new Vector3(0f,0f,-hitDirection.normalized.z) * 50f, ForceMode.Impulse);
+
+        this.enabled = false; // disabling script
     }
     IEnumerator DisableAnimator()
     {
