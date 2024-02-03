@@ -5,7 +5,6 @@ using Assets.Scripts.Weapons;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,6 +20,7 @@ public class EnemyScript : MonoBehaviour , IHuman
     public float MinDistance;
     public float MaxDistance;
     public GameObject Weapon_GO;
+
     [Header("Object Pooling")]
     [SerializeField] Transform TransformHierarchy;
     [SerializeField] GameObject BulletPrefab;
@@ -28,15 +28,20 @@ public class EnemyScript : MonoBehaviour , IHuman
     private static Queue<GameObject> _bullets = new Queue<GameObject>();
     public float FireFreq;
     private float _fireCounter;
+    public Vector3 GunScatter;
+
     [Header("NavMesh Agent")]
     public NavMeshAgent navMeshAgent;
     public Vector3 StartPoint;
+    public bool gotShot=false;
+
     [Header("Strafe Properties")]
     public Transform StrafeLeft;
     public Transform StrafeRight;
     public bool isGoingLeft;
     public bool isGoingRight;
     public bool CanStrafe;
+
     [Header("Movement Situation")]
     public MovementState Movement;
     public float RunSpeed  = 7f;
@@ -53,6 +58,11 @@ public class EnemyScript : MonoBehaviour , IHuman
             _health = value;
         }
     }
+    private Controller m_PlayerController;
+    private void Start()
+    {
+        m_PlayerController = Player.GetComponent<Controller>();
+    }
     private void Update()
     {
         if (Movement == MovementState.Moving)
@@ -60,16 +70,21 @@ public class EnemyScript : MonoBehaviour , IHuman
         else if (Movement == MovementState.Running)
             TotalSpeed = Mathf.Lerp(TotalSpeed, RunSpeed, Time.deltaTime * 5f);
 
+        float distance = Vector3.Distance(transform.position, Player.transform.position);
+
+        if (gotShot || ((distance < MaxDistance) && (m_PlayerController.Movement == MovementState.Moving || m_PlayerController.Movement == MovementState.Running)))
+            isPlayerDetected = true;
+        
         if (isPlayerDetected)
         {
-            if (Vector3.Distance(transform.position, Player.transform.position) > MaxDistance)
+            if (distance > MaxDistance)
             {
                 ResetAllBehaviour();
                 ComeBack();
                 return;
             }
 
-            if (Vector3.Distance(transform.position, Player.transform.position) > MinDistance)
+            if (distance > MinDistance)
                 Chase();
             else
             {
@@ -78,10 +93,7 @@ public class EnemyScript : MonoBehaviour , IHuman
                 Strafe();
             }
 
-            m_Rigs.enableRig = true;
-            LookPlayer();
-            Shot();
-            m_Animator.SetBool("RealizedEnemy", true);
+            RealizeEnemy();
         }
         else
         {
@@ -89,8 +101,16 @@ public class EnemyScript : MonoBehaviour , IHuman
             ComeBack();
         }
     }
+    public void RealizeEnemy()
+    {
+        m_Rigs.enableRig = true;
+        LookPlayer();
+        Shot();
+        m_Animator.SetBool("RealizedEnemy", true);
+    }
     public void ResetAllBehaviour()
     {
+        gotShot = false;
         m_Rigs.enableRig = false;
         ResetStrafe();
         StopChasing();
@@ -171,7 +191,6 @@ public class EnemyScript : MonoBehaviour , IHuman
         navMeshAgent.stoppingDistance = MinDistance;
         m_Animator.SetBool("StartChasing", false);
     }
-
     public void LookPlayer()
     {
         var relativePos = transform.position - Player.transform.position;
@@ -183,7 +202,7 @@ public class EnemyScript : MonoBehaviour , IHuman
         if (Time.time > _fireCounter)
         {
             _fireCounter = FireFreq + Time.time;
-            Static_ObjectPooling.do_ObjectPooling(BulletPrefab, TransformHierarchy, BulletDirection, _bullets);
+            Static_ObjectPooling.do_ObjectPooling(this,BulletPrefab, TransformHierarchy, BulletDirection, _bullets);
         }
     }
     public void TakeDamage(int damage,Vector3 hitDirection)
@@ -194,6 +213,8 @@ public class EnemyScript : MonoBehaviour , IHuman
             Death(hitDirection);
             m_dissolveEffect.DoDissolving();
         }
+        if (!isPlayerDetected)
+            gotShot = true;
     }
     private Rigidbody spine;
     public void Death(Vector3 hitDirection)

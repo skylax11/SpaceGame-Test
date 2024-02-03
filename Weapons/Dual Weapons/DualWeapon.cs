@@ -23,6 +23,8 @@ namespace Assets.Scripts.Weapons.Dual_Weapons
         {
             Magazine.SetActive(false);
             GameObject income = Instantiate(newMagazine, null);
+            foreach (var TheCollider in IgnoreCollision)
+                Physics.IgnoreCollision(income.GetComponent<Collider>(), TheCollider);
             income.transform.localScale = new Vector3(2f, 2f, 2f);
             income.transform.parent = null;
             income.transform.position = Magazine.transform.position;
@@ -31,20 +33,11 @@ namespace Assets.Scripts.Weapons.Dual_Weapons
             var RigidBody = income.transform.GetComponent<Rigidbody>();
             var Collider = income.transform.GetComponents<Collider>();
 
-            Collider[0].enabled = false;
-            Collider[1].enabled = false;
-            RigidBody.useGravity = true;
-            RigidBody.isKinematic = false;
-            RigidBody.isKinematic = false;
-
             Rigidbody[] twoWeapon = income.transform.GetComponentsInChildren<Rigidbody>();
             for (int i = 0; i < twoWeapon.Length; i++)
             {
                 var ChildRigidbody = twoWeapon[i].transform.GetComponent<Rigidbody>();
                 twoWeapon[i].transform.parent = null;
-                ChildRigidbody.isKinematic = false;
-                ChildRigidbody.useGravity = true;
-                twoWeapon[i].transform.GetComponent<Collider>().enabled = true;    
                 ChildRigidbody.AddForce(transform.forward.normalized * 100f * Mathf.Pow(-1,i));
             }
             return income;

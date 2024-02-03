@@ -19,12 +19,14 @@ namespace Assets.Scripts.Weapons
         {
             Magazine.SetActive(false);
             GameObject income = Instantiate(newMagazine, null);
+
+            foreach(var Collider in IgnoreCollision)
+                Physics.IgnoreCollision(income.GetComponent<Collider>(), Collider); // disabling collision between
+                                                                                    // character and the bullet box
             income.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             income.transform.parent = null;
             income.transform.position = Magazine.transform.position;
             income.transform.rotation = Magazine.transform.rotation;
-            income.transform.GetComponent<Collider>().enabled = false;
-            income.transform.GetComponent<Rigidbody>().useGravity = true;
             income.transform.GetComponent<Rigidbody>().AddForce(transform.forward.normalized * 200f);
             return income;
         }

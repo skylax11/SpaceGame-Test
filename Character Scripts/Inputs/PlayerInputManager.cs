@@ -82,6 +82,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
         if (Controller.Instance.Movement == MovementState.Running || Controller.Instance.Movement == MovementState.Crouching)
             return;
         SetWalking();
+
     }
     public void SetWalking()
     {

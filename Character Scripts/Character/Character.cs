@@ -49,7 +49,7 @@ public class Character : MonoBehaviour , IHuman
             Collider.enabled = true;
         GetComponent<Collider>().enabled = false;
         StartCoroutine("DisableAnimator");
-        spine.AddForce(new Vector3(0f, 0f, -hitDirection.normalized.z) * 20f, ForceMode.Impulse);
+        spine.AddForce(new Vector3(0f, 0f, -hitDirection.normalized.z) * 5f, ForceMode.Impulse);
 
         this.enabled = false; // disabling script
     }

@@ -47,12 +47,13 @@ public static class Static_ObjectPooling {
             }
         }
     }
-    public static void do_ObjectPooling(GameObject prefab, Transform bulletHierarchy, Transform bulletDirection, Queue<GameObject> bullets)
+    public static void do_ObjectPooling(EnemyScript enemy,GameObject prefab, Transform bulletHierarchy, Transform bulletDirection, Queue<GameObject> bullets)
     {
         if (bullets.Count <= 30)
         {
             GameObject bullet = GameObject.Instantiate(prefab, bulletDirection);
             bullet.transform.parent = bulletHierarchy;
+            bullet.transform.localRotation = bullet.transform.localRotation * Quaternion.Euler(1f, Random.Range(-enemy.GunScatter.y, enemy.GunScatter.y), 1f);
             bullets.Enqueue(bullet);
         }
         else
@@ -60,7 +61,7 @@ public static class Static_ObjectPooling {
             GameObject bullet = bullets.Peek();
             if (!bullet.active)
             {
-                bullet.transform.rotation = bulletDirection.rotation;
+                bullet.transform.rotation = bulletDirection.rotation * Quaternion.Euler(1f, Random.Range(-enemy.GunScatter.y, enemy.GunScatter.y), 1f); ;
                 bullet.transform.position = bulletDirection.position;
                 bullet.GetComponent<BulletScript>().ResetVelo();
                 bullet.SetActive(true);
@@ -77,7 +78,7 @@ public static class Static_ObjectPooling {
 
                     if (bullet.gameObject.active == false)
                     {
-                        bullet.transform.rotation = bulletDirection.rotation;
+                        bullet.transform.rotation = bulletDirection.rotation * Quaternion.Euler(1f, Random.Range(-enemy.GunScatter.y, enemy.GunScatter.y), 1f); ;
                         bullet.transform.position = bulletDirection.position;
                         bullet.transform.GetComponent<BulletScript>().ResetVelo();
                         bullet.gameObject.SetActive(true);
@@ -88,6 +89,4 @@ public static class Static_ObjectPooling {
             }
         }
     }
-
-
 }

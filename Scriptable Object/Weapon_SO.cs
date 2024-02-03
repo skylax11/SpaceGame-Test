@@ -35,5 +35,7 @@ namespace Assets.Scripts.Scriptable_Object
         public Vector3 LeftHintPosAim;
         public Vector3 RightHintPosAim;
         public GameObject BulletBox;
+        public AudioClip WeaponShot;
+        public AudioClip WeaponReload;
     }
 }

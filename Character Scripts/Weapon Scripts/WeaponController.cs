@@ -69,6 +69,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
         if (Time.time > _fireCounter)
         {
             _fireCounter = weapon.FireFreq + Time.time;
+            SoundController.Instance.PlayWeaponSound(0.5f,1f,weapon.WeaponSO.WeaponShot);
             weapon.Fire(weapon,bulletPrefab,bulletHierarchy,_bullets);
         }
     }
@@ -78,6 +79,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
         {
             if (weapon.Magazine > 0)
             {
+                SoundController.Instance.PlayWeaponSound(0.5f, 1f, weapon.WeaponSO.WeaponReload);
                 weapon.isReadyToUse = false;
                 weapon.Reload();
                 m_UIManager.UpdateAmmo(weapon.Ammo);

@@ -24,6 +24,7 @@ namespace Assets.Scripts.Weapons
         public Transform BulletPos;
         public bool isDualWeapon;
         public bool isReadyToUse;
+        public Collider[] IgnoreCollision;
         public void Reload()
         {
             int neededAmmo = FullAmmo - Ammo;

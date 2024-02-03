@@ -37,10 +37,12 @@ public class Controller : MonobehaviourSingleton<Controller>
         if (Movement == MovementState.Moving)
         {
             TotalSpeed = Mathf.Lerp(TotalSpeed, MoveSpeed, Time.deltaTime * 5f);
+            SoundController.Instance.PlayWalkSound(0.3f,1.2f);
         }
         else if (Movement == MovementState.Running)
         {
             TotalSpeed = Mathf.Lerp(TotalSpeed, RunSpeed, Time.deltaTime * 5f);
+            SoundController.Instance.PlayWalkSound(0.6f,1.5f);
         }
         else if(Movement == MovementState.Standing)
         {
@@ -49,6 +51,7 @@ public class Controller : MonobehaviourSingleton<Controller>
         else if (Movement == MovementState.Crouching)
         {
             TotalSpeed = Mathf.Lerp(TotalSpeed, CrouchSpeed, Time.deltaTime * 5f);
+            SoundController.Instance.PlayWalkSound(0.1f,1f);
         }
         Move();
         RotateMouse();
