@@ -8,17 +8,24 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
 {
-    public Vector2 direction;
+    [Header("Other Scripts")]
     public WeaponController m_GunFireController;
     public UI_Manager m_UIManager;
     public PlayerInput m_playerInput;
     private Rigidbody m_RigidBody;
     private CapsuleCollider m_Collider;
+    private DissappearEffect m_Dissappear;
+
+    [Header("Player Movement")]
+    public Vector2 direction;
+    
+    public bool canUseSkill = true;
     private void Start()
     {
         m_Collider = GetComponentInChildren<CapsuleCollider>();
         m_RigidBody = GetComponent<Rigidbody>();
         m_playerInput = GetComponent<PlayerInput>();
+        m_Dissappear = GetComponent<DissappearEffect>();
     }
     private void Update()
     {
@@ -37,6 +44,27 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
             m_UIManager.SprintCircleIncrease();
             Controller.Instance.m_Speed = Mathf.Lerp(Controller.Instance.m_Speed, 0.3f, Time.deltaTime);
         }
+        if (m_UIManager.SkillAmount == 0)
+        {
+            canUseSkill = false;
+            StartCoroutine("EnableSkill");
+        }
+        if (canUseSkill && (m_playerInput.actions["Jump"].IsPressed() && m_UIManager.SkillAmount > 0))
+        {
+            m_UIManager.SkillCircleDecrease();
+            m_Dissappear.DoDissappearing(true);
+        }
+        else if(m_UIManager.SkillAmount != 1)
+        {
+            m_UIManager.SkillCircleIncrease();
+            if(m_Dissappear._dissappearTime != -1)
+                m_Dissappear.DoDissappearing(false);
+        }
+    }
+    IEnumerator EnableSkill()
+    {
+        yield return new WaitForSeconds(3f);
+        canUseSkill = true;
     }
     public void OnCrouch(InputValue val)
     {
@@ -119,12 +147,8 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     }
     public void OnReload()
     {
-        if (WeaponController.Instance.Reload())
-        {
-            m_RigidBody.velocity = Vector3.zero;
-            direction = Vector2.zero;
-            SlotSystem.Instance.CurrentSlot.SetReload(true);
-        }
+        if(WeaponController.Instance.Reload())
+            AnimationController.Instance.SetAnimation("Reload",true);
     }
     public void OnSwap(InputValue val)
     {
@@ -135,5 +159,14 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
             SlotSystem.Instance.ChangeWeapon(key);
         }
     }
-
+    IEnumerator SetEnable()
+    {
+        yield return new WaitForSeconds(2f);
+        SetRigSettings.Instance._holdingRig.weight = 1f;
+        SetRigSettings.Instance._handRig.weight = 1f;
+    }
+    public void OnTeleportSkill()
+    {
+        Controller.Instance.TeleportSkill();
+    }
 }

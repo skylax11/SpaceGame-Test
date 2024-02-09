@@ -12,20 +12,26 @@ namespace Assets.Scripts.Character_Scripts.Inventory
 {
     public class SlotSystem : MonobehaviourSingleton<SlotSystem>
     {
+        [Header("Inventory & Slot")]
         public GameObject Inventory;
         public Weapon Slot1;
         public Weapon Slot2;
         public Weapon CurrentSlot;
+        [Header("Other")]
         private UI_Manager m_UIManager;
-        [SerializeField] Weapon _emptySlot; // no need to code thousands of null checks,, it simply solves the problem
+        [SerializeField] Weapon _emptySlot;          // no need to code thousands of null checks,, it simply solves the problem
+        [SerializeField] DissappearEffect _effect;
         private void Start()
         {
+            _effect = GetComponent<DissappearEffect>();
             m_UIManager = GetComponent<UI_Manager>();
             CurrentSlot = Slot1;
         }
         public void ChangeWeapon(int key) 
         {
-            
+            if (CheckoutDissappearing())     // that means if player holding space for being dissappear. i dont let player
+                return;                      // change or pick up weapon while disappering.
+
             if (key == 1)
             {
                 Slot1.gameObject.SetActive(true);
@@ -33,6 +39,7 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot1.transform.name = Slot1.WeaponSO.Name;
                 Slot2.transform.name = "Disabled" + Slot2.WeaponSO.Name;
                 CurrentSlot = Slot1;
+                AnimationController.Instance.ChangeMotion(2,"Reload", Slot1.WeaponSO.WeaponReload_Clip);
             }
             else if(key == 2)                         // WEAPON NAMES ARE RE-DECLARED CAUSE PREVENT ANY BUGS WHICH CAN OCCUR FROM ANIMATION
             {                            
@@ -41,6 +48,7 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot2.transform.name = Slot2.WeaponSO.Name;
                 Slot1.transform.name = "Disabled" + Slot1.WeaponSO.Name;
                 CurrentSlot = Slot2;
+                AnimationController.Instance.ChangeMotion(2,"Reload", Slot2.WeaponSO.WeaponReload_Clip);
             }
             if (CurrentSlot != _emptySlot)
                 SetRigSettings.Instance.SetRigDatas(CurrentSlot);
@@ -48,9 +56,13 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 SetRigSettings.Instance.ResetRigDatas(CurrentSlot);
             AnimationController.Instance.Magazine = CurrentSlot.BulletBox;
             UpdateAmmoInfo();
+
         }
         public void PickUp(WeaponStands stand)
         {
+            if (CheckoutDissappearing())
+                return;
+
             if (Slot1 != _emptySlot && Slot2 != _emptySlot)
             {
                 CurrentSlot.ThrowWeaponAway();   // i love polymorphism...
@@ -90,7 +102,7 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot2 = pickUpWeapon;
                 CurrentSlot = Slot2;
             }
-
+            AnimationController.Instance.ChangeMotion(2, "Reload", CurrentSlot.WeaponSO.WeaponReload_Clip);
             SetRigSettings.Instance.SetRigDatas(CurrentSlot);
             UpdateAmmoInfo();
         }
@@ -111,6 +123,11 @@ namespace Assets.Scripts.Character_Scripts.Inventory
             AnimationController.Instance.Magazine = stand.weapon.BulletBox;
         }
         public void PickUp_WeaponControllerSettings() => WeaponController.Instance.bulletTransform = CurrentSlot.BulletPos;
+        private bool CheckoutDissappearing()
+        {
+            bool value = _effect._dissappearTime != -1 ? true : false;
+            return value;
+        }
 
     }
 }

@@ -9,7 +9,9 @@ namespace Assets.Scripts.Enemy
 {
     public class EnemyScript_PlayerDetection : MonoBehaviour
     {
+        [Header("Enemy Script")]
         [SerializeField] EnemyScript m_EnemyScript;
+
         [Header("View")]
         public float radius;
         public float angle;

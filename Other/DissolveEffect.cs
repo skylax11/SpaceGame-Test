@@ -9,6 +9,7 @@ public class DissolveEffect : MonoBehaviour
     [SerializeField] float _dissolveSpeed;
     private float _dissolveTime = -1f;
 
+    [Header("Skinned Mesh Renderer & Mesh Renderer")]
     [SerializeField] SkinnedMeshRenderer[] m_SkinnedMeshMaterials;
     [SerializeField] MeshRenderer[] m_Materials;
     public void SetMaterials()

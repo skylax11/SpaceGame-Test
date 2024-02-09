@@ -9,27 +9,38 @@ using UnityEngine.InputSystem;
 
 public class SetRigSettings : MonobehaviourSingleton<SetRigSettings>
 {
-    public bool LetSetRigs;
+    [Header("Rigs")]
     public Rig _aimingRig;
     public Rig _holdingRig;
+    public Rig _handRig;
+    public bool LetSetRigs;
+
+    [Header("Rig Builder")]
     public RigBuilder rigBuild;
+
+    [Header("Rig Constraints")]
     [SerializeField] GameObject AimPose;
     public MultiPositionConstraint MultiPositionConstraint_Stand;
     public MultiPositionConstraint MultiPositionConstraint_Aim;
     public TwoBoneIKConstraint TwoBoneConstraintIK_Left;
     public TwoBoneIKConstraint TwoBoneConstraintIK_Right;
+    [SerializeField] Transform RotateChest;
 
+    [Header("Two Bone Constraint Props")]
     public Transform LeftHint;
     public Transform RightHint;
-
-    [SerializeField] Riggings _aimingRiggings;
-    [SerializeField] Riggings _holdingRiggings;
     public Transform LeftHand;
     public Transform RightHand;
-    [SerializeField] Transform RotateChest;
+
+    [Header("Riggings Scripts")]
+    [SerializeField] Riggings _aimingRiggings;
+    [SerializeField] Riggings _holdingRiggings;
+
+    [Header("Other")]
     private GameObject _currentWeapon;
     [SerializeField] Weapon_SO _currentSO;
     [SerializeField] WeaponController CurrentWeapon;
+
     void Start() => SetNewWeaponSettings();
     public void BuildRig() => rigBuild.Build();
 
@@ -110,6 +121,14 @@ public class SetRigSettings : MonobehaviourSingleton<SetRigSettings>
         TwoBoneConstraintIK_Left.data.target  = null;
         TwoBoneConstraintIK_Right.data.target = null;
 
+        BuildRig();
+    }
+    public void ResetRigDatas()
+    {
+        CurrentWeapon.weapon = SlotSystem.Instance.CurrentSlot;
+
+        TwoBoneConstraintIK_Left.data.target = null;
+        TwoBoneConstraintIK_Right.data.target = null;
         BuildRig();
     }
 }

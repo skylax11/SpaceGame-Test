@@ -6,17 +6,29 @@ using UnityEngine.Animations.Rigging;
 
 public class EnemyScript_Rigs : MonoBehaviour
 {
-    [SerializeField] Weapon_SO Enemy_SO;
+    [Header("Rig Builder")]
     public RigBuilder rigBuild;
-    [SerializeField] public bool enableRig;
+
+    [Header("Scriptable Object")]
+    [SerializeField] Weapon_SO Enemy_SO;
+
+    [Header("Rigs")]
+
+    public Rig _aimingRig;
+    public Rig _holdingRig;
+    public bool enableRig;
+
+    [Header("Two Bone Constraints")]
+
+    public TwoBoneIKConstraint TwoBoneConstraintIK_Left;
+    public TwoBoneIKConstraint TwoBoneConstraintIK_Right;
+
+    [Header("Two Bone Constraint Props")]
+
     [SerializeField] Transform LeftHand;
     [SerializeField] Transform RightHand;
     [SerializeField] Transform LeftHint;
     [SerializeField] Transform RightHint;
-    [SerializeField] public Rig _aimingRig;
-    [SerializeField] public Rig _holdingRig;
-    public TwoBoneIKConstraint TwoBoneConstraintIK_Left;
-    public TwoBoneIKConstraint TwoBoneConstraintIK_Right;
 
     void Update()
     {

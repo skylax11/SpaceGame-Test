@@ -10,10 +10,16 @@ using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour , IHuman
 {
+    [Header("Dissolve Effect")]
     [SerializeField] DissolveEffect m_dissolveEffect;
+
+    [Header("Enemy Scripts")]
     [SerializeField] EnemyScript_PlayerDetection m_Detection;
     [SerializeField] EnemyScript_Rigs m_Rigs;
+
+    [Header("Player")]
     [SerializeField] Controller Player;
+    [SerializeField] DissappearEffect m_PlayerDissappearEffect;
     [SerializeField] int _health;
     [SerializeField] Animator m_Animator;
     public bool isPlayerDetected;
@@ -24,11 +30,14 @@ public class EnemyScript : MonoBehaviour , IHuman
     [Header("Object Pooling")]
     [SerializeField] Transform TransformHierarchy;
     [SerializeField] GameObject BulletPrefab;
-    [SerializeField] Transform BulletDirection; 
-    private static Queue<GameObject> _bullets = new Queue<GameObject>();
+    [SerializeField] Transform BulletDirection;
+
+    [Header("Weapon")]
     public float FireFreq;
-    private float _fireCounter;
     public Vector3 GunScatter;
+    private float _fireCounter;
+    private static Queue<GameObject> _bullets = new Queue<GameObject>();
+
 
     [Header("NavMesh Agent")]
     public NavMeshAgent navMeshAgent;
@@ -59,9 +68,12 @@ public class EnemyScript : MonoBehaviour , IHuman
         }
     }
     private Controller m_PlayerController;
+    private Character m_Character;
     private void Start()
     {
         m_PlayerController = Player.GetComponent<Controller>();
+        m_Character = Player.GetComponentInChildren<Character>();
+        m_PlayerDissappearEffect = Player.GetComponent<DissappearEffect>();
     }
     private void Update()
     {
@@ -70,17 +82,22 @@ public class EnemyScript : MonoBehaviour , IHuman
         else if (Movement == MovementState.Running)
             TotalSpeed = Mathf.Lerp(TotalSpeed, RunSpeed, Time.deltaTime * 5f);
 
+        if (m_PlayerDissappearEffect.isVisible == false)
+        {
+            ResetAllBehaviour();
+            return;
+        }
+
         float distance = Vector3.Distance(transform.position, Player.transform.position);
 
-        if (gotShot || ((distance < MaxDistance) && (m_PlayerController.Movement == MovementState.Moving || m_PlayerController.Movement == MovementState.Running)))
+        if (m_Character.Health > 0 && (gotShot || ((distance < MaxDistance) && (m_PlayerController.Movement == MovementState.Moving || m_PlayerController.Movement == MovementState.Running))))
             isPlayerDetected = true;
-        
+
         if (isPlayerDetected)
         {
             if (distance > MaxDistance)
             {
                 ResetAllBehaviour();
-                ComeBack();
                 return;
             }
 
@@ -96,10 +113,7 @@ public class EnemyScript : MonoBehaviour , IHuman
             RealizeEnemy();
         }
         else
-        {
             ResetAllBehaviour();
-            ComeBack();
-        }
     }
     public void RealizeEnemy()
     {
@@ -114,6 +128,7 @@ public class EnemyScript : MonoBehaviour , IHuman
         m_Rigs.enableRig = false;
         ResetStrafe();
         StopChasing();
+        ComeBack();
         m_Animator.SetBool("RealizedEnemy", false);
     }
     public void ComeBack()
@@ -150,8 +165,6 @@ public class EnemyScript : MonoBehaviour , IHuman
     }
     public void Strafe()
     {
-        Debug.DrawRay(StrafeLeft.transform.position, -StrafeLeft.transform.right, Color.blue);
-        Debug.DrawRay(StrafeRight.transform.position, StrafeRight.transform.right, Color.red);
         if (!Physics.Raycast(StrafeLeft.transform.position, -StrafeLeft.transform.right, 0.1f) && isGoingLeft)
             isGoingLeft = true;
         else

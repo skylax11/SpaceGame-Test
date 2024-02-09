@@ -30,7 +30,6 @@ namespace Assets.Scripts.Weapons
             income.transform.GetComponent<Rigidbody>().AddForce(transform.forward.normalized * 200f);
             return income;
         }
-        public override void SetReload(bool situation) => AnimationController.Instance.SetAnimation("Reload", situation);
         public override void ThrowWeaponAway()
         {
             transform.parent = null;

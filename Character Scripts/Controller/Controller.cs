@@ -22,18 +22,30 @@ public class Controller : MonobehaviourSingleton<Controller>
 
     [Header("Layer For Mouse")]
     public LayerMask layer;
+
     [Header("Animation")]
     public Animator m_AnimationController;
     public float m_Speed;
+
     [Header("Rigidbody")]
     [SerializeField] Rigidbody m_Rigidbody;
+
     [Header("UI")]
     [SerializeField] UI_Manager m_UIManager;
-  
+
+    [Header("Skill")]
+    [SerializeField] GameObject CheckForColliding;
+    [SerializeField] DissappearEffect m_DissappearEffect;
+    [SerializeField] Material _teleportMaterial;
+
+    [Header("Character")]
+    public Character m_Character;
+
     private void Start() => transform.rotation = Quaternion.Euler(0, 180, 0);
 
     private void Update()
     {
+        Debug.DrawRay(CheckForColliding.transform.position, CheckForColliding.transform.forward,Color.blue);
         if (Movement == MovementState.Moving)
         {
             TotalSpeed = Mathf.Lerp(TotalSpeed, MoveSpeed, Time.deltaTime * 5f);
@@ -111,5 +123,19 @@ public class Controller : MonobehaviourSingleton<Controller>
     {
         m_Rigidbody.velocity = Vector3.Slerp(m_Rigidbody.velocity,_direction*TotalSpeed,Time.deltaTime*15f);
         m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity,TotalSpeed);  
-    }                                                                                     
+    }
+    public void TeleportSkill()
+    {
+        Vector3 teleportTo = new Vector3(CheckForColliding.transform.position.x + CheckForColliding.transform.forward.x * 2, transform.position.y, CheckForColliding.transform.position.z + CheckForColliding.transform.forward.z * 2);
+        if (!Physics.Raycast(CheckForColliding.transform.position, teleportTo, Vector3.Distance(CheckForColliding.transform.position, teleportTo)))
+        {
+            m_DissappearEffect.DoDissappearing(_teleportMaterial);
+            StartCoroutine("WaitProcess",teleportTo);
+        }
+    }
+    IEnumerator WaitProcess(Vector3 teleportTo)
+    {
+        yield return new WaitForSeconds(1f);
+        transform.position = teleportTo;
+    }
 }

@@ -10,21 +10,25 @@ using UnityEngine.InputSystem;
 public class WeaponController : MonobehaviourSingleton<WeaponController>
 {
     [Header("Inputs & Weapon")]
-    private float _fireCounter;
     public Weapon weapon;
-    private PlayerInput m_playerInput;
     public WeaponSituation WeaponEnum;
     public bool isAvailable = true;
+    private float _fireCounter;
+    private PlayerInput m_playerInput;
+    
+
     [Header("Bullet")]
+    public Transform bulletTransform;
     private Queue<GameObject> _bullets = new Queue<GameObject>();
     [SerializeField] GameObject bulletPrefab;
-    [SerializeField] public Transform bulletTransform;
     [SerializeField] Transform bulletHierarchy;
+
+
     [Header("UI")]
     [SerializeField] UI_Manager m_UIManager;
-    [Header("Other")]
-    [SerializeField] Riggings _holdingRiggings;
-    [SerializeField] Riggings _aimingRiggings;
+
+    [Header("Dissappear Effect")]
+    [SerializeField] DissappearEffect m_PlayerDissappearEffect;
     public enum WeaponSituation
     {
         Firing,
@@ -37,6 +41,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
         weapon = SlotSystem.Instance.Slot1;
         m_playerInput = GetComponent<PlayerInput>();
         m_UIManager = GetComponent<UI_Manager>();
+        m_PlayerDissappearEffect = GetComponent<DissappearEffect>();
         if (weapon != null)
         {
             m_UIManager.UpdateAmmo(weapon.Ammo);
@@ -45,7 +50,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
     }
     void Update()
     {
-        if (weapon == null)
+        if (weapon == null || m_PlayerDissappearEffect.isVisible == false)
             return;
         if ((m_playerInput.actions["shot"].IsPressed() && weapon.Ammo > 0)  && weapon.isReadyToUse)
         {

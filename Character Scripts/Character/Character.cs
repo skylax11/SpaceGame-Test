@@ -4,12 +4,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 
 public class Character : MonoBehaviour , IHuman
 {
-    [SerializeField] int _health;
+    [Header("Effects")]
     [SerializeField] DissolveEffect m_DissolveEffect;
+    [SerializeField] DissappearEffect m_DissappearEffect;
+
+    [Header("IHuman Props")]
+    [SerializeField] int _health;
+
+    [Header("Other")]
     [SerializeField] Transform _hierarchy;
+    [SerializeField] PlayerInputManager m_PlayerInputManager;
     public int Health
     {
         get
@@ -21,16 +29,22 @@ public class Character : MonoBehaviour , IHuman
             _health = value;
         }
     }
-    public void TakeDamage(int damage, Vector3 hitDirection) => UpdateUI(damage, hitDirection);
-
-    public void UpdateUI(int damage , Vector3 hitDirection)
+    public void UpdateUI(int previousHealth)
     {
-        int oldHealth = _health;
+        UI_Manager.Instance.Health.text =  _health.ToString();
+        UI_Manager.Instance.HealthBar.fillAmount = _health / 100f;
+    }
+    public void TakeDamage(int damage, Vector3 hitDirection) => IsDead(damage, hitDirection);
+
+    public void IsDead(int damage , Vector3 hitDirection)
+    {
+        int previousHealth = _health;
         _health -= damage;
-        UI_Manager.Instance.Health.text = ((int)Mathf.Lerp(oldHealth, _health,Time.deltaTime*15f)).ToString();
-        UI_Manager.Instance.HealthBar.fillAmount = (Mathf.Lerp(UI_Manager.Instance.HealthBar.fillAmount, _health / 100, Time.deltaTime * 15f));
+        UpdateUI(previousHealth);
         if (_health <= 0)
         {
+            m_PlayerInputManager.enabled = false;
+            Destroy(m_DissappearEffect); // Destroying Dissappear effect for preventing any possible bugs
             Death(hitDirection);
             m_DissolveEffect.DoDissolving();
         }

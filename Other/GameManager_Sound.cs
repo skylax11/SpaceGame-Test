@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GameManager_Sound : MonoBehaviour
 {
+    [Header("Music List")]
     [SerializeField] List<AudioClip> _audioClips_Ambient = new List<AudioClip>();
+    [Header("Audio Source")]
     [SerializeField] AudioSource m_AudioSource;
     void Start()
     {

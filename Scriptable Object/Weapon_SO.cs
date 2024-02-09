@@ -37,5 +37,6 @@ namespace Assets.Scripts.Scriptable_Object
         public GameObject BulletBox;
         public AudioClip WeaponShot;
         public AudioClip WeaponReload;
+        public AnimationClip WeaponReload_Clip;
     }
 }

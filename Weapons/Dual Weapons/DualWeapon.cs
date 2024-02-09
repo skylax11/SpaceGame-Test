@@ -42,7 +42,6 @@ namespace Assets.Scripts.Weapons.Dual_Weapons
             }
             return income;
         }
-        public override void SetReload(bool situation) => AnimationController.Instance.SetAnimation("Reload2", situation);
 
         public override void ThrowWeaponAway()
         {

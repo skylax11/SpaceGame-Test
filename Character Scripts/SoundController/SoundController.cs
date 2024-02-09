@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class SoundController : MonobehaviourSingleton<SoundController>
 {
+    [Header("Walk Sounds List")]
     [SerializeField] List<AudioClip> _audioClips_Walk = new List<AudioClip>();
 
-    [SerializeField] AudioSource m_AudioSource_Walk;
+    [Header("Audio Sources")]
+    [SerializeField] public AudioSource m_AudioSource_Walk;
     [SerializeField] AudioSource m_AudioSource_Weapon;
     public void PlayWalkSound(float volume,float pitch)
     {
