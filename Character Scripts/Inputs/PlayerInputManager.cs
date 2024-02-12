@@ -20,6 +20,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     public Vector2 direction;
     
     public bool canUseSkill = true;
+    private bool canUseTeleport = true;
     private void Start()
     {
         m_Collider = GetComponentInChildren<CapsuleCollider>();
@@ -53,12 +54,15 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
         {
             m_UIManager.SkillCircleDecrease();
             m_Dissappear.DoDissappearing(true);
+            canUseTeleport = false;
         }
         else if(m_UIManager.SkillAmount != 1)
         {
             m_UIManager.SkillCircleIncrease();
-            if(m_Dissappear._dissappearTime != -1)
+            if (m_Dissappear._dissappearTime != -1)
                 m_Dissappear.DoDissappearing(false);
+            else
+                canUseTeleport = true;
         }
     }
     IEnumerator EnableSkill()
@@ -147,8 +151,8 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     }
     public void OnReload()
     {
-        if(WeaponController.Instance.Reload())
-            AnimationController.Instance.SetAnimation("Reload",true);
+        if (WeaponController.Instance.Reload())
+            SlotSystem.Instance.CurrentSlot.SetReload(true);
     }
     public void OnSwap(InputValue val)
     {
@@ -167,6 +171,7 @@ public class PlayerInputManager : MonobehaviourSingleton<PlayerInputManager>
     }
     public void OnTeleportSkill()
     {
-        Controller.Instance.TeleportSkill();
+        if(canUseTeleport)
+            Controller.Instance.TeleportSkill();
     }
 }

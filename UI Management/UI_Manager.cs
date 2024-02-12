@@ -27,13 +27,16 @@ public class UI_Manager : MonobehaviourSingleton<UI_Manager>
     [Range(0,1)] public float SkillAmount;
 
     [Header("Scripts")]
-    [SerializeField] WeaponStands lastOne;
+    [SerializeField] WeaponStands LastOne;
     private Controller m_Controller;
 
     [Header("Decoder")]
-    [SerializeField] TMP_InputField password;
-    [SerializeField] TextMeshProUGUI message;
+    [SerializeField] TMP_InputField Password;
+    [SerializeField] TextMeshProUGUI Message;
     [SerializeField] GameObject PasswordPanel;
+
+    [Header("Player Input")]
+    [SerializeField] PlayerInput m_PlayerInput;
     private void Start() => m_Controller = GetComponent<Controller>();
     public void UpdateAmmo(int ammo) => Ammo.text = ammo.ToString();
     public void UpdateMagazine(int mag) => Magazine.text = mag.ToString();
@@ -45,7 +48,7 @@ public class UI_Manager : MonobehaviourSingleton<UI_Manager>
         {
             if (hitInfo.transform.TryGetComponent(out WeaponStands stand) != false)
             {
-                lastOne = stand;
+                LastOne = stand;
                 InfoText.text = $"Press 'E' to pickup {stand.weapon.WeaponSO.name}";
                 stand.text.text = stand.weapon.WeaponSO.name;
                 SetActivePanel(true);
@@ -76,19 +79,23 @@ public class UI_Manager : MonobehaviourSingleton<UI_Manager>
         }
     }
     private KeyPanel _currentKeyPanel;
-    public void SetPasswordPanel(bool situation) => PasswordPanel.SetActive(situation);
+    public void SetPasswordPanel(bool situation)
+    {
+        PasswordPanel.SetActive(situation);
+        m_PlayerInput.enabled = !situation;
+    }
     public void CheckForPassword(string password)
     {
         if (_currentKeyPanel.CheckForPassword(password))
             SetPasswordPanel(false);
         else
-            message.text = "Invalid Password";
+            Message.text = "Invalid Password";
     }
     public void SetActivePanel(bool situation)
     {
         InfoPanel.SetActive(situation);
-        if (lastOne != null)
-            lastOne.text.enabled = situation;
+        if (LastOne != null)
+            LastOne.text.enabled = situation;
     }
     public void SprintCircleIncrease()
     {

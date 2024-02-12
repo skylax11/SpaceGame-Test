@@ -22,6 +22,8 @@ public class DissappearEffect : MonoBehaviour
     [Header("Dissappear Effect")]
     private bool isPressingTemp;
     public bool isVisible = true;
+    [SerializeField] float _teleportSpeed;
+
     [Header("Sound Manager")]
     [SerializeField] SoundController m_SoundController;
     [Header("PlayerInputManager Script")]
@@ -136,7 +138,7 @@ public class DissappearEffect : MonoBehaviour
     
     public void SetDissappearing()
     {
-        _teleportTime += !reverseIt ? _dissappearSpeed : -_dissappearSpeed;
+        _teleportTime += !reverseIt ? _teleportSpeed : -_teleportSpeed;
         _teleportTime = Mathf.Clamp(_teleportTime, -1f, 1f);
 
         foreach (var m in m_SkinnedMeshMaterials)
@@ -160,6 +162,7 @@ public class DissappearEffect : MonoBehaviour
             for (int i = 0; i < m_Materials.Length; i++)
                 m_Materials[i].materials = _oldMaterialsOther[i];
             reverseIt = false;
+            m_playerInputManager.enabled = true;
             CancelInvoke("SetDissappearing");
         }
 
@@ -176,6 +179,5 @@ public class DissappearEffect : MonoBehaviour
         AnimationController.Instance.SetAnimation("ExitTeleport", true);
         AnimationController.Instance.SetAnimation("EnterTeleport", false);
         reverseIt = true;
-        m_playerInputManager.enabled = true;
     }
 }

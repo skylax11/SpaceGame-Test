@@ -4,24 +4,25 @@ using Assets.Scripts.Enum;
 using Assets.Scripts.Weapons;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour , IHuman
 {
-    [Header("Dissolve Effect")]
+    [Header("Effects")]
     [SerializeField] DissolveEffect m_dissolveEffect;
+    [SerializeField] DissappearEffect m_PlayerDissappearEffect;
 
     [Header("Enemy Scripts")]
     [SerializeField] EnemyScript_PlayerDetection m_Detection;
     [SerializeField] EnemyScript_Rigs m_Rigs;
+    [SerializeField] int _health;
+    public bool callOnce = true;
 
     [Header("Player")]
     [SerializeField] Controller Player;
-    [SerializeField] DissappearEffect m_PlayerDissappearEffect;
-    [SerializeField] int _health;
-    [SerializeField] Animator m_Animator;
     public bool isPlayerDetected;
     public float MinDistance;
     public float MaxDistance;
@@ -51,11 +52,18 @@ public class EnemyScript : MonoBehaviour , IHuman
     public bool isGoingRight;
     public bool CanStrafe;
 
+    [Header("Patrol")]
+    public bool canPatrol;
+    [SerializeField] Enemy_Patrol m_EnemyPatrol;
+
     [Header("Movement Situation")]
     public MovementState Movement;
     public float RunSpeed  = 7f;
     public float WalkSpeed = 5f;
     public float TotalSpeed;
+
+    [Header("Animation")]
+    [SerializeField] Animator m_Animator;
     public int Health
     {
         get
@@ -92,28 +100,38 @@ public class EnemyScript : MonoBehaviour , IHuman
 
         if (m_Character.Health > 0 && (gotShot || ((distance < MaxDistance) && (m_PlayerController.Movement == MovementState.Moving || m_PlayerController.Movement == MovementState.Running))))
             isPlayerDetected = true;
-
         if (isPlayerDetected)
         {
+            callOnce = true;
+
             if (distance > MaxDistance)
             {
                 ResetAllBehaviour();
                 return;
             }
-
             if (distance > MinDistance)
                 Chase();
             else
             {
                 StopChasing();
-                if(CanStrafe)
-                Strafe();
+                if (CanStrafe)
+                    Strafe();
             }
-
             RealizeEnemy();
         }
         else
+        {
+             if (!callOnce)
+                 return;
             ResetAllBehaviour();
+            callOnce = false;
+        }
+    }
+    public void DoPatrol()
+    {
+        m_Animator.SetBool("ComeBack", true);
+        m_EnemyPatrol.DoPatrol();
+        navMeshAgent.isStopped = false;
     }
     public void RealizeEnemy()
     {
@@ -128,7 +146,10 @@ public class EnemyScript : MonoBehaviour , IHuman
         m_Rigs.enableRig = false;
         ResetStrafe();
         StopChasing();
-        ComeBack();
+        if (!canPatrol)
+            ComeBack();
+        else
+            DoPatrol();
         m_Animator.SetBool("RealizedEnemy", false);
     }
     public void ComeBack()
@@ -186,9 +207,12 @@ public class EnemyScript : MonoBehaviour , IHuman
     {
         m_Animator.SetBool("RightStrafe", false);
         m_Animator.SetBool("LeftStrafe", false);
+        isGoingLeft = false;
+        isGoingRight = false;
     }
     public void Chase()
     {
+        m_Animator.SetBool("taunt", false);
         Movement = MovementState.Running;
         navMeshAgent.isStopped = false;
         ResetStrafe();
@@ -201,7 +225,10 @@ public class EnemyScript : MonoBehaviour , IHuman
     public void StopChasing()
     {
         Movement = MovementState.Moving;
-        navMeshAgent.stoppingDistance = MinDistance;
+        if(!canPatrol)
+            navMeshAgent.stoppingDistance = MinDistance;
+        else
+            navMeshAgent.stoppingDistance = 0;
         m_Animator.SetBool("StartChasing", false);
     }
     public void LookPlayer()
@@ -265,5 +292,4 @@ public class EnemyScript : MonoBehaviour , IHuman
         GetComponentInParent<Animator>().enabled = false;
     }
     public void DisableConstraints() => GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
-
 }

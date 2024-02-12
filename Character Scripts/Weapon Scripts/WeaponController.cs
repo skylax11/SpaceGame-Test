@@ -20,7 +20,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
     [Header("Bullet")]
     public Transform bulletTransform;
     private Queue<GameObject> _bullets = new Queue<GameObject>();
-    [SerializeField] GameObject bulletPrefab;
+    public GameObject bulletPrefab;
     [SerializeField] Transform bulletHierarchy;
 
 

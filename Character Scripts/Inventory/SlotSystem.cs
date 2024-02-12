@@ -39,7 +39,6 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot1.transform.name = Slot1.WeaponSO.Name;
                 Slot2.transform.name = "Disabled" + Slot2.WeaponSO.Name;
                 CurrentSlot = Slot1;
-                AnimationController.Instance.ChangeMotion(2,"Reload", Slot1.WeaponSO.WeaponReload_Clip);
             }
             else if(key == 2)                         // WEAPON NAMES ARE RE-DECLARED CAUSE PREVENT ANY BUGS WHICH CAN OCCUR FROM ANIMATION
             {                            
@@ -48,15 +47,16 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot2.transform.name = Slot2.WeaponSO.Name;
                 Slot1.transform.name = "Disabled" + Slot1.WeaponSO.Name;
                 CurrentSlot = Slot2;
-                AnimationController.Instance.ChangeMotion(2,"Reload", Slot2.WeaponSO.WeaponReload_Clip);
             }
             if (CurrentSlot != _emptySlot)
+            {
                 SetRigSettings.Instance.SetRigDatas(CurrentSlot);
+                UpdateBulletMesh();
+            }
             else
                 SetRigSettings.Instance.ResetRigDatas(CurrentSlot);
             AnimationController.Instance.Magazine = CurrentSlot.BulletBox;
             UpdateAmmoInfo();
-
         }
         public void PickUp(WeaponStands stand)
         {
@@ -102,9 +102,15 @@ namespace Assets.Scripts.Character_Scripts.Inventory
                 Slot2 = pickUpWeapon;
                 CurrentSlot = Slot2;
             }
-            AnimationController.Instance.ChangeMotion(2, "Reload", CurrentSlot.WeaponSO.WeaponReload_Clip);
             SetRigSettings.Instance.SetRigDatas(CurrentSlot);
             UpdateAmmoInfo();
+            UpdateBulletMesh();
+        }
+        private void UpdateBulletMesh()
+        {
+            WeaponController.Instance.bulletPrefab.GetComponent<MeshRenderer>().sharedMaterial.color = CurrentSlot.WeaponSO.bulletColor;
+            DynamicGI.SetEmissive(WeaponController.Instance.bulletPrefab.GetComponent<MeshRenderer>(), CurrentSlot.WeaponSO.bulletColor_Emissive);
+            WeaponController.Instance.bulletPrefab.GetComponent<MeshRenderer>().sharedMaterial.SetVector("_EmissionColor", CurrentSlot.WeaponSO.bulletColor_Emissive * CurrentSlot.WeaponSO.bulletColor_EmissiveFloat);
         }
         public void UpdateAmmoInfo()
         {

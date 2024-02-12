@@ -42,5 +42,6 @@ namespace Assets.Scripts.Weapons
         public abstract void Fire(Weapon weapon, GameObject prefab, Transform bulletHierarchy, Queue<GameObject> bullets);
         public abstract GameObject ReloadAnimation(GameObject newMagazine,GameObject Magazine);
         public abstract void ThrowWeaponAway();
+        public abstract void SetReload(bool situation);
     }
 }

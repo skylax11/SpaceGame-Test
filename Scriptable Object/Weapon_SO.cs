@@ -38,5 +38,8 @@ namespace Assets.Scripts.Scriptable_Object
         public AudioClip WeaponShot;
         public AudioClip WeaponReload;
         public AnimationClip WeaponReload_Clip;
+        public Color bulletColor;
+        public Color bulletColor_Emissive;
+        public float bulletColor_EmissiveFloat;
     }
 }
