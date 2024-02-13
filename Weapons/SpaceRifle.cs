@@ -11,6 +11,7 @@ namespace Assets.Scripts.Weapons
     public class SpaceRifle : Weapon
     {
         public override void SetReload(bool situation) => AnimationController.Instance.SetAnimation("Reload", situation);
+        public override void SetSoundSettings() => SoundController.Instance.PlayWeaponSound(0.5f, 1f, WeaponSO.WeaponShot);
         public override void Fire(Weapon weapon, GameObject prefab, Transform bulletHierarchy, Queue<GameObject> bullets)
         {
             Static_ObjectPooling.do_ObjectPooling(weapon, prefab, bulletHierarchy, weapon.BulletPos, bullets);

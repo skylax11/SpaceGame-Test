@@ -74,7 +74,7 @@ public class WeaponController : MonobehaviourSingleton<WeaponController>
         if (Time.time > _fireCounter)
         {
             _fireCounter = weapon.FireFreq + Time.time;
-            SoundController.Instance.PlayWeaponSound(0.5f,1f,weapon.WeaponSO.WeaponShot);
+            weapon.SetSoundSettings();
             weapon.Fire(weapon,bulletPrefab,bulletHierarchy,_bullets);
         }
     }

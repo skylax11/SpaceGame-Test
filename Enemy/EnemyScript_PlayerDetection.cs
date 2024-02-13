@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Assets.Scripts.Enemy
 {
@@ -25,23 +27,23 @@ namespace Assets.Scripts.Enemy
             {
                 Transform target = rangeChecks[0].transform;
                 Vector3 direction = (target.position - transform.position).normalized;
+                float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-                if (Vector3.Angle(transform.forward,direction) < angle / 2)
-                {
-                    float distanceToTarget = Vector3.Distance(transform.position, target.position);
-                    if (!Physics.Raycast(transform.position, target.position - transform.position, distanceToTarget, ObstructionMask))
-                        m_EnemyScript.isPlayerDetected = true;
-                    else
-                        m_EnemyScript.isPlayerDetected = false;
-                }
+                if (Vector3.Angle(transform.forward, direction) < angle / 2)
+                    CheckForObstacle(target, distanceToTarget);
                 else
-                    m_EnemyScript.isPlayerDetected = false;
-
+                    SetBooleans(false);
             }
             else if (m_EnemyScript.isPlayerDetected)
-                m_EnemyScript.isPlayerDetected = false;
-            
+                SetBooleans(false);
         }
-
+        private void SetBooleans(bool s) => m_EnemyScript.canShot = m_EnemyScript.isPlayerDetected = s;
+        private void CheckForObstacle(Transform target,float distanceToTarget)
+        {
+            if (!Physics.Raycast(transform.position, target.position - transform.position, distanceToTarget, ObstructionMask))
+                SetBooleans(true);
+            else
+                SetBooleans(false);
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Assets.Scripts.Weapons.Dual_Weapons
         [SerializeField] public Transform BulletRight;
 
         public override void SetReload(bool situation) => AnimationController.Instance.SetAnimation("Reload2", situation);
+        public override void SetSoundSettings() => SoundController.Instance.PlayWeaponSound(0.5f, 1.2f, WeaponSO.WeaponShot);
         public override void Fire(Weapon weapon, GameObject prefab, Transform bulletHierarchy, Queue<GameObject> bullets)
         {
             DualWeapon dualWeapon = weapon as DualWeapon;

@@ -43,5 +43,6 @@ namespace Assets.Scripts.Weapons
         public abstract GameObject ReloadAnimation(GameObject newMagazine,GameObject Magazine);
         public abstract void ThrowWeaponAway();
         public abstract void SetReload(bool situation);
+        public abstract void SetSoundSettings();
     }
 }

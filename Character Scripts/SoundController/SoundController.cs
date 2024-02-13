@@ -23,7 +23,7 @@ public class SoundController : MonobehaviourSingleton<SoundController>
     }
     public void PlayWeaponSound(float volume, float pitch,AudioClip clip)
     {
-        if ((m_AudioSource_Weapon.time < m_AudioSource_Weapon.clip.length / 2))
+        if ((m_AudioSource_Weapon.time < m_AudioSource_Weapon.clip.length / 1.2))
         {
             m_AudioSource_Weapon.volume = volume;
             m_AudioSource_Weapon.pitch = pitch;

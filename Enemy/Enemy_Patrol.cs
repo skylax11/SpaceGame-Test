@@ -16,8 +16,18 @@ public class Enemy_Patrol : MonoBehaviour
         DestinationPointIndex = 0;
         m_Agent.SetDestination(PatrolPoints[DestinationPointIndex]);
         DestinationPoint = PatrolPoints[DestinationPointIndex];
+        InvokeRepeating("CheckNewPoint",0.1f,0.5f);
     }
     public void DoPatrol()
+    {
+        if (DestinationPoint.x != m_Agent.destination.x && DestinationPoint.z != m_Agent.destination.z)
+        {
+            m_Agent.stoppingDistance = 0;
+            m_Agent.isStopped = false;
+            m_Agent.SetDestination(DestinationPoint);
+        }
+    }
+    public void CheckNewPoint()
     {
         if (Vector3.Distance(transform.position, DestinationPoint) < 1)
         {
@@ -26,12 +36,6 @@ public class Enemy_Patrol : MonoBehaviour
             if (DestinationPointIndex == PatrolPoints.Count)
                 DestinationPointIndex = 0;
             DestinationPoint = PatrolPoints[DestinationPointIndex];
-            m_Agent.SetDestination(DestinationPoint);
-        }
-        if (DestinationPoint.x != m_Agent.destination.x && DestinationPoint.z != m_Agent.destination.z)
-        {
-            m_Agent.stoppingDistance = 0;
-            m_Agent.isStopped = false;
             m_Agent.SetDestination(DestinationPoint);
         }
     }

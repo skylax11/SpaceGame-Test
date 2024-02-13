@@ -45,7 +45,6 @@ public class Controller : MonobehaviourSingleton<Controller>
 
     private void Update()
     {
-        Debug.DrawRay(CheckForColliding.transform.position, CheckForColliding.transform.forward,Color.blue);
         if (Movement == MovementState.Moving)
         {
             TotalSpeed = Mathf.Lerp(TotalSpeed, MoveSpeed, Time.deltaTime * 5f);
@@ -126,16 +125,16 @@ public class Controller : MonobehaviourSingleton<Controller>
     }
     public void TeleportSkill()
     {
-        Vector3 teleportTo = new Vector3(CheckForColliding.transform.position.x + CheckForColliding.transform.forward.x * 2, transform.position.y, CheckForColliding.transform.position.z + CheckForColliding.transform.forward.z * 2);
-        if (!Physics.Raycast(CheckForColliding.transform.position, teleportTo, Vector3.Distance(CheckForColliding.transform.position, teleportTo)))
+        if (!Physics.CheckBox(CheckForColliding.transform.position, new Vector3(1f,1f,1f)))
         {
             m_DissappearEffect.DoDissappearing(_teleportMaterial);
-            StartCoroutine("WaitProcess",teleportTo);
+            StartCoroutine("WaitProcess");
         }
+        
     }
-    IEnumerator WaitProcess(Vector3 teleportTo)
+    IEnumerator WaitProcess()
     {
         yield return new WaitForSeconds(1f);
-        transform.position = teleportTo;
+        transform.position = new Vector3(CheckForColliding.transform.position.x, transform.position.y,CheckForColliding.transform.position.z);
     }
 }

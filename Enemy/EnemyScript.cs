@@ -8,6 +8,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 
 public class EnemyScript : MonoBehaviour , IHuman
 {
@@ -43,8 +44,9 @@ public class EnemyScript : MonoBehaviour , IHuman
     [Header("NavMesh Agent")]
     public NavMeshAgent navMeshAgent;
     public Vector3 StartPoint;
-    public bool gotShot=false;
-
+    public bool gotShot = false;
+    public bool moveOn = false;
+    public bool canShot = true;
     [Header("Strafe Properties")]
     public Transform StrafeLeft;
     public Transform StrafeRight;
@@ -64,6 +66,10 @@ public class EnemyScript : MonoBehaviour , IHuman
 
     [Header("Animation")]
     [SerializeField] Animator m_Animator;
+
+    [Header("Audio Source")]
+    [SerializeField] AudioSource m_AudioSource;
+
     public int Health
     {
         get
@@ -79,6 +85,7 @@ public class EnemyScript : MonoBehaviour , IHuman
     private Character m_Character;
     private void Start()
     {
+        m_AudioSource = GetComponent<AudioSource>();
         m_PlayerController = Player.GetComponent<Controller>();
         m_Character = Player.GetComponentInChildren<Character>();
         m_PlayerDissappearEffect = Player.GetComponent<DissappearEffect>();
@@ -99,8 +106,11 @@ public class EnemyScript : MonoBehaviour , IHuman
         float distance = Vector3.Distance(transform.position, Player.transform.position);
 
         if (m_Character.Health > 0 && (gotShot || ((distance < MaxDistance) && (m_PlayerController.Movement == MovementState.Moving || m_PlayerController.Movement == MovementState.Running))))
-            isPlayerDetected = true;
-        if (isPlayerDetected)
+            moveOn = true;
+        else
+            moveOn = false;
+
+        if (isPlayerDetected || moveOn)
         {
             callOnce = true;
 
@@ -114,7 +124,7 @@ public class EnemyScript : MonoBehaviour , IHuman
             else
             {
                 StopChasing();
-                if (CanStrafe)
+                if (CanStrafe && canShot)
                     Strafe();
             }
             RealizeEnemy();
@@ -135,19 +145,31 @@ public class EnemyScript : MonoBehaviour , IHuman
     }
     public void RealizeEnemy()
     {
-        m_Rigs.enableRig = true;
         LookPlayer();
-        Shot();
-        m_Animator.SetBool("RealizedEnemy", true);
+
+        if (canShot)
+        {
+            m_Rigs.enableRig = true;
+            Shot();
+            m_Animator.SetBool("RealizedEnemy", true);
+        }
+        else
+        {
+            m_Rigs.enableRig = false;
+            m_Animator.SetBool("RealizedEnemy", false);
+            Chase();
+        }
+
     }
     public void ResetAllBehaviour()
     {
         gotShot = false;
         m_Rigs.enableRig = false;
+        moveOn = false;
         ResetStrafe();
         StopChasing();
         if (!canPatrol)
-            ComeBack();
+            InvokeRepeating("ComeBack", 0.1f, 0.5f);
         else
             DoPatrol();
         m_Animator.SetBool("RealizedEnemy", false);
@@ -161,7 +183,10 @@ public class EnemyScript : MonoBehaviour , IHuman
         navMeshAgent.SetDestination(StartPoint);
         
         if (Vector3.Distance(transform.position, StartPoint) <= 1)
+        {
             m_Animator.SetBool("ComeBack", false);
+            CancelInvoke("ComeBack");
+        }
         else
             m_Animator.SetBool("ComeBack", true);
     }
@@ -242,6 +267,8 @@ public class EnemyScript : MonoBehaviour , IHuman
         if (Time.time > _fireCounter)
         {
             _fireCounter = FireFreq + Time.time;
+            if ((m_AudioSource.time < m_AudioSource.clip.length / 1.2))
+                m_AudioSource.Play();
             Static_ObjectPooling.do_ObjectPooling(this,BulletPrefab, TransformHierarchy, BulletDirection, _bullets);
         }
     }
@@ -262,6 +289,7 @@ public class EnemyScript : MonoBehaviour , IHuman
         navMeshAgent.enabled = false;
         m_Detection.enabled = false;
         isPlayerDetected = false;
+        moveOn = false;
 
         var RigidbodyWep = Weapon_GO.GetComponent<Rigidbody>();
         RigidbodyWep.isKinematic = false;
